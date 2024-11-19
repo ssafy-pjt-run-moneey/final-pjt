@@ -1,116 +1,176 @@
 <template>
   <div id="app">
-    <!-- 고정된 네비게이션 바 -->
+    <!-- 상단 헤더 영역 -->
+    <div class="header">
+      <div class="header-content">
+        <!-- 왼쪽 로고 -->
+        <h2>달려라 멍니🐾</h2>
+        <!-- 오른쪽 인증 링크 -->
+        <div class="auth-links">
+          <a href="#" class="auth-link">회원가입</a>
+          <span class="divider">|</span>
+          <a href="#" class="auth-link">로그인</a>
+          <span class="divider">|</span>
+          <a href="#" class="auth-link">마이페이지</a>
+          <span class="divider">|</span>
+          <a href="#" class="auth-link">로그아웃</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 메인 로고 영역 -->
+    <div class="logo-container">
+      <!-- 클릭 시 홈으로 이동 -->
+      <router-link to="/" class="logo-img-container">
+        <img src="/logo.png" alt="달려라 멍니" class="logo-img">
+      </router-link>
+    </div>
+    
+    <!-- 네비게이션 바 -->
     <nav class="navbar">
-      <div class="nav-logo">달려라 멍니</div>
       <ul class="nav-links">
-        <li><a href="#">마이페이지</a></li>
-        <li><a href="#">성향 테스트</a></li>
-        <li><a href="#">커뮤니티</a></li>
-        <li><a href="#">금융 상품 조회</a></li>
-        <li><a href="#">은행 검색</a></li>
-        <li><a href="#">환율 계산</a></li>
+        <!-- Use router-link for internal navigation -->
+        <li><router-link to="/test">성향 테스트</router-link></li>
+        <li><router-link to="/products">금융 상품</router-link></li>
+        <li><router-link to="/community">커뮤니티</router-link></li>
+        <li><router-link to="/bank">주변 은행</router-link></li>
+        <li><router-link to="/exchange">환율 계산</router-link></li>
       </ul>
     </nav>
     
-    <!-- 메인 콘텐츠 영역 -->
     <main class="main-content">
       <router-view />
     </main>
     
-    <!-- 하단 푸터 -->
     <footer class="footer">
       <div class="footer-content">
-        <p>© 2024 달려라 멍니 | 귀여운 금융 추천 서비스 🐾</p>
+        <p>© 2024 달려라 멍니 | 금융 추천 서비스 🐾</p>
       </div>
     </footer>
   </div>
 </template>
 
 <style scoped>
-/* 전체 배경 스타일 */
 #app {
   min-height: 100vh;
-  width: 100%; /* 앱이 화면 전체 너비를 차지하도록 설정 */
-  background-color: #F8DDC7; /* 앱에도 동일한 배경색 적용 */
+  background-color: #FFF8F3;
+  margin: 0;
+  padding: 0;
+  width: 100%;
 }
 
-/* 고정된 네비게이션 바 스타일 */
-.navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  /* width: 100%; */
-  height: 60px;
-  background-color: #706873; /* 명세서에서 제공한 색상 팔레트 */
-  color: white;
+/* 상단 헤더 스타일 */
+.header {
+  color: #706873;
+  background-color: #FFF8F3;
+  /* padding: 10px 0; */
+  /* border-bottom: 1px solid #d3d3d3; */
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 30px; /* 양쪽 여백을 넉넉하게 설정 */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); /* 네비바에 그림자 추가 */
-  border-bottom: 2px solid #C07A57; /* 하단에 테두리 추가 */
-  z-index: 1000;
+  padding: 0 20px;
 }
 
-.nav-logo {
-  font-size: 1.8rem; /* 로고 크기 조정 */
-  font-weight: bold; /* 로고에 굵은 글씨체 적용 */
+.auth-links {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.auth-link {
+  color: #333;
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.3s ease;
+}
+
+.auth-link:hover {
+  color: #C07A57;
+}
+
+.divider {
+  color: #d3d3d3;
+  font-size: 14px;
+}
+
+/* 기존 스타일 유지 */
+.logo-container {
+  display: flex;
+  justify-content: center;
+  /* padding: 20px 0; */
+  margin-bottom: 30px;
+}
+
+.logo-img {
+  height: 200px;
+  object-fit: contain;
+}
+
+.navbar {
+  background-color: transparent;
+  padding: 15px 0;
+  border-bottom: 1px solid #d3d3d3;
 }
 
 .nav-links {
   display: flex;
-  align-items: center;
+  justify-content: center;
   list-style-type: none;
-}
-
-.nav-links li {
-  margin-left: 25px; /* 링크 사이의 간격 조정 */
+  margin: 0;
+  padding: 0;
+  gap: 50px;
 }
 
 .nav-links a {
-  color: white;
+  color: #706873;
   text-decoration: none;
-  transition: color 0.3s ease-in-out; /* 호버 시 부드러운 색상 전환 효과 */
+  font-weight: 500;
+  font-size: 16px;
+  transition: color 0.3s ease;
 }
 
 .nav-links a:hover {
-  color: #F8DDC7; /* 링크 호버 시 색상 변경 */
+  color: #C07A57;
 }
 
-/* 반응형 디자인 - 화면 크기가 작아질 때 레이아웃 변경 */
-@media (max-width: 768px) {
- .navbar {
-   flex-direction: column;
-   align-items: flex-start;
-   padding: 10px; /* 작은 화면에서 패딩 조정 */
- }
-
- .nav-links {
-   flex-direction: column;
-   margin-top: 10px;
- }
-
- .nav-links li {
-   margin-left: 0;
-   margin-top: 10px; /* 링크 사이 간격 조정 */
- }
+.main-content {
+  padding: 20px;
 }
 
 .footer {
-  background-color: #706873; /* 따뜻한 어두운 색상 */
-  color: white;
-  margin-top: 50px;
-  padding: 10px;
-  width: 100%;
+  background-color: #FFF8F3;
+  color: #706873;
+  padding: 20px 0;
+  /* margin-top: 50px; */
   text-align: center;
 }
 
-.footer-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+@media (max-width: 768px) {
+  .header-content {
+    flex-direction: column;
+    gap: 10px;
+  }
 
+  .auth-links {
+    font-size: 12px;
+  }
+
+  .logo-img {
+    height: 100px;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .nav-links li {
+    margin: 10px 0;
+  }
+}
 </style>
