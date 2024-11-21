@@ -1,139 +1,125 @@
 <template>
-  <v-sheet class="pa-12">
-    <v-card class="mx-auto px-6 py-8" max-width="344">
-      <v-form v-model="form" @submit.prevent="onSubmit">
-        <h1 class="text-center mb-5">회원 가입</h1>
-        <v-text-field
-          v-model.trim="username"
-          :readonly="loading"
-          :rules="[required]"
-          class="mb-2 inputform"
-          clearable
-          label="아이디"
-          variant="solo-filled"
-        ></v-text-field>
+  <div class="signup-container">
+    <h1>회원가입</h1>
+    <form @submit.prevent="SignUp" class="signup-form">
+      <div class="form-group">
+        <label for="username">사용자 이름:</label>
+        <input type="text" id="username" v-model.trim="username" required>
+      </div>
 
-        <v-text-field
-          v-model.trim="nickname"
-          :readonly="loading"
-          :rules="[required]"
-          class="mb-2 inputform"
-          clearable
-          label="닉네임"
-          variant="solo-filled"
-        ></v-text-field>
+      <div class="form-group">
+        <label for="email">이메일:</label>
+        <input type="email" id="email" v-model.trim="email" required>
+      </div>
 
-        <v-text-field
-          v-model.trim="email"
-          :readonly="loading"
-          :rules="[required]"
-          class="mb-2 inputform"
-          clearable
-          label="이메일 주소"
-          variant="solo-filled"
-        ></v-text-field>
+      <div class="form-group">
+        <label for="password1">비밀번호:</label>
+        <input type="password" id="password1" v-model.trim="password1" required>
+      </div>
 
-        <v-text-field
-          v-model.trim="password1"
-          :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
-          :type="visible ? 'text' : 'password'"
-          :readonly="loading"
-          :rules="[required]"
-          class="mb-2 inputform"
-          clearable
-          label="비밀번호"
-          placeholder="비밀번호를 입력하세요"
-          @click:append-inner="visible = !visible"
-          variant="solo-filled"
-        ></v-text-field>
-
-        <v-text-field
-          v-model.trim="password2"
-          :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
-          :type="visible ? 'text' : 'password'"
-          :readonly="loading"
-          :rules="[required, passwordMatch]"
-          class="inputform"
-          clearable
-          label="비밀번호 확인"
-          placeholder="비밀번호를 입력하세요"
-          @click:append-inner="visible = !visible"
-          variant="solo-filled"
-        ></v-text-field>
-
-        <v-btn
-          :disabled="!form"
-          :loading="loading"
-          block
-          class="inputform btn"
-          color="white"
-          size="large"
-          type="submit"
-          variant="elevated"
-        >
-          회원가입하기
-        </v-btn>
-      </v-form>
-
-      <v-card-text class="text-center">
-        <RouterLink
-          :to="{ name: 'login' }"
-          style="text-decoration: none; color: black"
-          >로그인하기</RouterLink
-        >
-        <v-icon icon="mdi-chevron-right"></v-icon>
-      </v-card-text>
-    </v-card>
-  </v-sheet>
+      <div class="form-group">
+        <label for="password2">비밀번호 확인:</label>
+        <input type="password" id="password2" v-model.trim="password2" required>
+      </div>
+      
+      <button type="submit" class="submit-btn">가입하기</button>
+    </form>
+    <p v-if="error" class="error-message">{{ error }}</p>
+  </div>
 </template>
 
-<script setup lang="ts">
-import { ref } from "vue";
-import { useCommunityStore } from "@/stores/community";
-import { RouterLink } from "vue-router";
+<script setup>
+import { ref } from 'vue'
+import { useCounterStore } from '@/stores/counter'
 
-const form = ref(false);
-const loading = ref(false);
-const store = useCommunityStore();
+const username = ref('')
+const email = ref('')
+const password1 = ref('')
+const password2 = ref('')
+const error = ref('')
 
-const username = ref(null);
-const nickname = ref(null);
-const email = ref(null);
-const password1 = ref(null);
-const password2 = ref(null);
+const store = useCounterStore()
 
-const visible = ref(false);
+const SignUp = async function () {
+  error.value = ''
+  if (password1.value !== password2.value) {
+    error.value = '비밀번호가 일치하지 않습니다.'
+    return
+  }
 
-function onSubmit() {
-  console.log("가입시도중");
-
-  loading.value = true;
-  setTimeout(() => (loading.value = false), 2000);
-
-  signUp();
-}
-
-function required(v: any) {
-  return !!v || "필수 값입니다";
-}
-
-const signUp = function () {
-  const payload = {
-    username: username.value,
-    nickname: nickname.value,
-    email: email.value,
-    password1: password1.value,
-    password2: password2.value,
-  };
-  store.signUp(payload);
-};
-
-function passwordMatch() {
-  // 비밀번호와 비밀번호 확인이 서로 다를 경우 에러 메시지 반환
-  return password1.value === password2.value || "비밀번호가 일치하지 않습니다";
+  try {
+    const payload = {
+      username: username.value,
+      email: email.value,
+      password1: password1.value,
+      password2: password2.value
+    }
+    console.log('Signup payload:', payload);
+    await store.signUp(payload)
+  } catch (err) {
+    console.log('Signup error:', err.response?.data);
+    error.value = err.response?.data?.message || '회원가입 중 오류가 발생했습니다';
+  }
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
+.signup-container {
+  max-width: 400px;
+  margin: 30px auto 0;
+  padding: 20px;
+  background-color: #DDBEA9;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
 
+h1 {
+  color: #666;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.signup-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+input {
+  width: 96%;
+  padding: 8px;
+  border: 1px solid #d3d3d3;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.submit-btn {
+  background-color: #666;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.submit-btn:hover {
+  background-color: #5a545f;
+}
+
+.error-message {
+  color: #C07A57;
+  text-align: center;
+  margin-top: 10px;
+}
 </style>

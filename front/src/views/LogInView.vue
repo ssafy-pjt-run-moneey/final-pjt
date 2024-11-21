@@ -1,96 +1,91 @@
 <template>
-  <v-sheet class="pa-12 login-wrapper">
-    <v-card class="mx-auto px-6 py-8" max-width="344">
-      <v-form v-model="form" @submit.prevent="logIn">
-        <h1 class="text-center mb-5">로그인</h1>
-        <v-text-field
-          v-model.trim="username"
-          :readonly="loading"
-          :rules="[required]"
-          class="mb-2"
-          clearable
-          label="아이디"
-          variant="solo-filled"
-        ></v-text-field>
+  <div class="login-container">
+    <h1>로그인</h1>
+    <form @submit.prevent="LogIn" class="login-form">
+      <div class="form-group">
+        <label for="username">사용자 이름:</label>
+        <input type="text" id="username" v-model.trim="username" required>
+      </div>
 
-        <v-text-field
-          v-model.trim="password"
-          :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
-          :type="visible ? 'text' : 'password'"
-          :readonly="loading"
-          :rules="[required]"
-          class="mb-2"
-          clearable
-          label="비밀번호"
-          placeholder="비밀번호를 입력하세요"
-          @click:append-inner="visible = !visible"
-          variant="solo-filled"
-        ></v-text-field>
-
-        <br />
-
-        <v-btn
-          :disabled="!form"
-          :loading="loading"
-          block
-          class="login-btn"
-          color="white"
-          size="large"
-          type="submit"
-          variant="elevated"
-        >
-          로그인하기
-        </v-btn>
-      </v-form>
-
-      <v-card-text class="text-center">
-        <span class="mx-3">
-          <RouterLink
-            :to="{ name: 'findpassword' }"
-            style="text-decoration: none; color: black"
-            >비밀번호 찾기</RouterLink
-          >
-          <v-icon icon="mdi-chevron-right"></v-icon>
-        </span>
-
-        <RouterLink
-          :to="{ name: 'signup' }"
-          style="text-decoration: none; color: black"
-          >회원가입하기</RouterLink
-        >
-        <v-icon icon="mdi-chevron-right"></v-icon>
-      </v-card-text>
-    </v-card>
-  </v-sheet>
+      <div class="form-group">
+        <label for="password">비밀번호:</label>
+        <input type="password" id="password" v-model.trim="password" required>
+      </div>
+      
+      <button type="submit" class="submit-btn">로그인</button>
+    </form>
+  </div>
 </template>
 
-<script setup lang="ts">
-import { ref } from "vue";
-import { useCommunityStore } from "@/stores/community";
-import { RouterLink } from "vue-router";
+<script setup>
+import { ref } from 'vue'
+import { useCounterStore } from '@/stores/counter'
 
-const store = useCommunityStore();
-const form = ref(false);
-const loading = ref(false);
+const username = ref('')
+const password = ref('')
 
-const username = ref(null);
-const password = ref(null);
+const store = useCounterStore()
 
-const visible = ref(false);
-
-const logIn = function () {
+const LogIn = function () {
   const payload = {
     username: username.value,
-    password: password.value,
-  };
-  store.logIn(payload);
-};
-
-function required(v: any) {
-  return !!v || "필수 값입니다";
+    password: password.value
+  }
+  store.LogIn(payload)
 }
 </script>
 
-<style scoped lang="scss">
+<style scoped>
+.login-container {
+  max-width: 400px;
+  margin: 40px auto 0;
+  padding: 20px;
+  background-color: #DDBEA9;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
 
+h1 {
+  color: #666;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+input {
+  width: 96%;
+  padding: 8px;
+  border: 1px solid #d3d3d3;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.submit-btn {
+  background-color: #666;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.submit-btn:hover {
+  background-color: #5a545f;
+}
 </style>

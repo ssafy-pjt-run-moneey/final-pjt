@@ -3,6 +3,7 @@
     <section class="carousel-section">
       <Carousel
         :autoplay="3000"
+        :height="400"
         :wrap-around="true"
         :items-to-show="2"
         :snap-align="'center'"
@@ -16,14 +17,13 @@
             </div>
             <div class="carousel-content">
               <p class="description">{{ item.description }}</p>
-              <button class="action-button">{{ item.buttonText }}</button>
+              <router-link :to=item.title><button class="action-button">{{ item.buttonText }}</button></router-link>
             </div>
           </div>
         </Slide>
 
         <template #addons>
           <Navigation />
-          <Pagination />
         </template>
       </Carousel>
     </section>
@@ -43,26 +43,31 @@ const updateSlide = (val) => {
 
 const carouselItems = [
   {
+    title: "/test",
     description: "난 무슨 강아지?\n게임하고 금융 상품 추천 받자!",
     buttonText: "달려가기",
     image: '/15.png',
   },
   {
+    title: "/products",
     description: "내가 원하는 조건의\n금융 상품을 한 눈에!",
     buttonText: "상품보기",
     image: '/10.png',
   },
   {
+    title: "/community",
     description: "다른 사람들은\n어떻게 돈 관리를 하고 있을까?",
     buttonText: "소통하기",
     image: '/4.png',
   },
   {
+    title: "/map",
     description: "나에게 가장 가까운\n은행은 어디에 있을까?",
     buttonText: "검색하기",
     image: '/9.png',
   },
   {
+    title: "/exchange",
     description: "환율 계산기로\n여행 준비를 완벽하게!",
     buttonText: "계산하기",
     image: '/2.png',

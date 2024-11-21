@@ -7,13 +7,15 @@
         <h2>달려라 멍니🐾</h2>
         <!-- 오른쪽 인증 링크 -->
         <div class="auth-links">
-          <a href="#" class="auth-link">회원가입</a>
+          <RouterLink :to="{ name: 'SignUpView' }">회원가입</RouterLink>
           <span class="divider">|</span>
-          <a href="#" class="auth-link">로그인</a>
+          <RouterLink :to="{ name: 'LogInView' }"><input type="submit" value="로그인"></RouterLink>
           <span class="divider">|</span>
-          <a href="#" class="auth-link">마이페이지</a>
+          <RouterLink :to="{ name: 'MyPageView' }">마이페이지</RouterLink>
           <span class="divider">|</span>
-          <a href="#" class="auth-link">로그아웃</a>
+          <form @submit.prevent="LogOut">
+            <input type="submit" value="로그아웃">
+          </form>
         </div>
       </div>
     </div>
@@ -29,12 +31,12 @@
     <!-- 네비게이션 바 -->
     <nav class="navbar">
       <ul class="nav-links">
-        <!-- Use router-link for internal navigation -->
-        <li><router-link to="/test">성향 테스트</router-link></li>
-        <li><router-link to="/products">금융 상품</router-link></li>
-        <li><router-link to="/community">커뮤니티</router-link></li>
-        <li><router-link to="/bank">주변 은행</router-link></li>
-        <li><router-link to="/exchange">환율 계산</router-link></li>
+        <li v-for="(link, index) in navLinks" :key="index" class="nav-item">
+          <router-link :to="link.path" class="nav-link">
+            {{ link.text }}
+            <div class="nav-background" :style="{ backgroundImage: `url(/gal.png)` }"></div>
+          </router-link>
+        </li>
       </ul>
     </nav>
     
@@ -49,6 +51,25 @@
     </footer>
   </div>
 </template>
+
+<script setup>
+import { RouterView, RouterLink } from 'vue-router'
+import { useCounterStore } from '@/stores/counter'
+
+const store = useCounterStore()
+
+const logOut = function () {
+  store.logOut()
+}
+
+const navLinks = [
+  { path: '/test', text: '성향 테스트', image: '/path-to-test-image.jpg' },
+  { path: '/products', text: '금융 상품', image: '/path-to-products-image.jpg' },
+  { path: '/community', text: '커뮤니티', image: '/path-to-community-image.jpg' },
+  { path: '/map', text: '주변 은행', image: '/path-to-map-image.jpg' },
+  { path: '/exchange', text: '환율 계산', image: '/path-to-exchange-image.jpg' }
+]
+</script>
 
 <style scoped>
 #app {
@@ -115,6 +136,7 @@
   background-color: transparent;
   padding: 15px 0;
   border-bottom: 1px solid #d3d3d3;
+  font-size: 20px;
 }
 
 .nav-links {
@@ -126,16 +148,56 @@
   gap: 50px;
 }
 
-.nav-links a {
-  color: #706873;
-  text-decoration: none;
-  font-weight: 500;
-  font-size: 16px;
-  transition: color 0.3s ease;
+.nav-item {
+  position: relative;
+  padding: 10px 0;
+  height: 40px; /* Add fixed height to maintain consistent size */
+  display: flex;
+  align-items: center;
 }
 
-.nav-links a:hover {
-  color: #C07A57;
+.nav-link {
+  position: relative;
+  color: #666;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 17px;
+  transition: color 0.3s ease;
+  z-index: 3;
+  padding: 5px 10px;
+  line-height: 1; /* Add this to maintain consistent text height */
+}
+
+.nav-background {
+  position: absolute;
+  top: 40%; /* Adjust this value to move image up */
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 150%;
+  height: 170%;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+}
+
+.router-link-active {
+  color: #000000;
+  font-weight: 800;
+  font-size: 20px;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+  line-height: 1; /* Add this to maintain consistent text height */
+}
+
+.router-link-active .nav-background {
+  opacity: 0.5;
+}
+
+/* Optional: Show background on hover */
+.nav-link:hover .nav-background {
+  opacity: 0.3;
 }
 
 .main-content {
@@ -149,6 +211,7 @@
   /* margin-top: 50px; */
   text-align: center;
 }
+
 
 @media (max-width: 768px) {
   .header-content {

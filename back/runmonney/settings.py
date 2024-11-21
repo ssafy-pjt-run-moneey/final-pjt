@@ -33,10 +33,12 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     # App
     'accounts',
+    'exchange',
     # DRF
     'rest_framework',
     'rest_framework.authtoken',
-    # REST_AUTH
+    'rest_framework_simplejwt.token_blacklist',
+    # registration
     'dj_rest_auth',
     'corsheaders',
     'django.contrib.sites',
@@ -52,12 +54,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
-
 SITE_ID = 1
 
 REST_FRAMEWORK = {
-    # DRF auth settings
-    # Token 인증을 기본으로 사용하도록 설정
     # Authentication
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
@@ -77,8 +76,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # Add the account middleware:
-    "allauth.account.middleware.AccountMiddleware",
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 CORS_ALLOWED_ORIGINS = [
@@ -163,36 +161,4 @@ MEDIA_URL ='media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# 사용자 수정
 AUTH_USER_MODEL = 'accounts.User'
-
-
-# ALL AUTH 수정
-# dj-rest-auth 는 email 을 필수적으로 사용하도록 구현되어 있으므로, 해당 사항을 수정
-ACCOUNT_EMAIL_REQUIRED = False
-ACCOUNT_EMAIL_VERIFICATION = None
-
-
-# django 인증 시스템에서 사용할 백엔드 클래스 지정
-# 기본 인증 백엔드와 allauth 패키지에서 제공하는 인증 백엔드를 모두 사용하겠다는 설정.
-AUTHENTICATION_BACKENDS = (
-# django 기본 인증 백엔드
-"django.contrib.auth.backends.ModelBackend",
-# django-allauth 패키지에서 제공하는 인증 백엔드 클래스.
-"allauth.account.auth_backends.AuthenticationBackend",
-)
-
-
-# REST-AUTH 회원가입 기본 Serailizer 재정의
-# REST_AUTH = {
-# 'REGISTER_SERIALIZER': 'accounts.serializers.CustomRegisterSerializer',
-# 'PASSWORD_RESET_SERIALIZER': 'accounts.serializers.CustomPasswordResetSerializer',
-# }
-
-
-# 커스터마이징 adapter로 설정
-ACCOUNT_ADAPTER = 'accounts.models.CustomAccountAdapter'
-
-# REST_AUTH_SERIALIZERS = {
-#     'PASSWORD_RESET_SERIALIZER': 'accounts.serializers.CustomPasswordResetSerializer',
-# }
