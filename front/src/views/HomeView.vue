@@ -55,7 +55,7 @@ const carouselItems = [
     image: '/10.png',
   },
   {
-    title: "/community",
+    title: "/articles",
     description: "다른 사람들은\n어떻게 돈 관리를 하고 있을까?",
     buttonText: "소통하기",
     image: '/4.png',

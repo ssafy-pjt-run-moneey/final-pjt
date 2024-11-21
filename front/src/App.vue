@@ -7,15 +7,19 @@
         <h2>달려라 멍니🐾</h2>
         <!-- 오른쪽 인증 링크 -->
         <div class="auth-links">
-          <RouterLink :to="{ name: 'SignUpView' }">회원가입</RouterLink>
-          <span class="divider">|</span>
-          <RouterLink :to="{ name: 'LogInView' }"><input type="submit" value="로그인"></RouterLink>
-          <span class="divider">|</span>
-          <RouterLink :to="{ name: 'MyPageView' }">마이페이지</RouterLink>
-          <span class="divider">|</span>
-          <form @submit.prevent="LogOut">
-            <input type="submit" value="로그아웃">
-          </form>
+          <!-- 로그인하지 않은 경우 -->
+          <template v-if="!store.isLogin">
+            <RouterLink :to="{ name: 'SignUpView' }" class="auth-link">회원가입</RouterLink>
+            <span class="divider">|</span>
+            <RouterLink :to="{ name: 'LogInView' }" class="auth-link">로그인</RouterLink>
+          </template>
+          
+          <!-- 로그인한 경우 -->
+          <template v-else>
+            <RouterLink :to="{ name: 'MyPageView' }" class="auth-link">마이페이지</RouterLink>
+            <span class="divider">|</span>
+            <button @click="handleLogout" class="logout-btn">로그아웃</button>
+          </template>
         </div>
       </div>
     </div>
@@ -23,25 +27,25 @@
     <!-- 메인 로고 영역 -->
     <div class="logo-container">
       <!-- 클릭 시 홈으로 이동 -->
-      <router-link to="/" class="logo-img-container">
+      <RouterLink to="/" class="logo-img-container">
         <img src="/logo.png" alt="달려라 멍니" class="logo-img">
-      </router-link>
+      </RouterLink>
     </div>
     
     <!-- 네비게이션 바 -->
     <nav class="navbar">
       <ul class="nav-links">
         <li v-for="(link, index) in navLinks" :key="index" class="nav-item">
-          <router-link :to="link.path" class="nav-link">
+          <RouterLink :to="link.path" class="nav-link">
             {{ link.text }}
             <div class="nav-background" :style="{ backgroundImage: `url(/gal.png)` }"></div>
-          </router-link>
+          </RouterLink>
         </li>
       </ul>
     </nav>
     
     <main class="main-content">
-      <router-view />
+      <RouterView />
     </main>
     
     <footer class="footer">
@@ -58,16 +62,20 @@ import { useCounterStore } from '@/stores/counter'
 
 const store = useCounterStore()
 
-const logOut = function () {
-  store.logOut()
+const handleLogout = async () => {
+  try {
+    await store.logOut()
+  } catch (error) {
+    console.error('로그아웃 실패:', error)
+  }
 }
 
 const navLinks = [
-  { path: '/test', text: '성향 테스트', image: '/path-to-test-image.jpg' },
-  { path: '/products', text: '금융 상품', image: '/path-to-products-image.jpg' },
-  { path: '/community', text: '커뮤니티', image: '/path-to-community-image.jpg' },
-  { path: '/map', text: '주변 은행', image: '/path-to-map-image.jpg' },
-  { path: '/exchange', text: '환율 계산', image: '/path-to-exchange-image.jpg' }
+  { path: '/test', text: '성향 테스트' },
+  { path: '/products', text: '금융 상품' },
+  { path: '/articles', text: '커뮤니티' },
+  { path: '/map', text: '주변 은행' },
+  { path: '/exchange', text: '환율 계산' }
 ]
 </script>
 

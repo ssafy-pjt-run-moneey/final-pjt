@@ -1,47 +1,66 @@
-# views.py
-
 import requests
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
 from datetime import datetime
+from django.http import JsonResponse
 
-@api_view(['GET'])
-def exchange_rate_api(request):
-    # Get query parameters from the request (base_currency and target_currency)
-    base_currency = request.GET.get('base_currency')
-    target_currency = request.GET.get('target_currency')
 
-    if not base_currency or not target_currency:
-        return Response({"error": "Missing required parameters: base_currency and target_currency"}, status=400)
-
-    # Get the current date in 'YYYYMMDD' format
-    current_date = datetime.now().strftime('%Y%m%d')
-
-    # Replace 'YOUR_API_KEY' with your actual API key
-    auth_key = "sCqdNQGIog1c8b451iW63Ji4dCeLW4hR"
+def exchange(request):
+    API_KEY = "sCqdNQGIog1c8b451iW63Ji4dCeLW4hR"  # Replace with your actual API key
+    BASE_URL = "https://www.koreaexim.go.kr/site/program/financial/exchangeJSON"
     
-    # Construct the API URL with the required parameters
-    url = f"https://www.koreaexim.go.kr/site/program/financial/exchangeJSON?authkey={auth_key}&searchdate={current_date}&data=AP01"
+    # Get today's date in YYYY-MM-DD format
+    today = datetime.now().strftime('%Y-%m-%d')
     
-    try:
-        # Make a GET request to the external API
-        response = requests.get(url)
-        response.raise_for_status()  # Raises an error for bad responses (4xx, 5xx)
+    # Fetch data from API
+    params = {
+        "authkey": API_KEY,
+        "searchdate": today,
+        "data": "AP01"
+    }
+    
+    response = requests.get(BASE_URL, params=params)
+    
+    if response.status_code == 200:
+        data = response.json()
         
-        # Parse the JSON response
-        exchange_rates = response.json()
-
-        # Find rates for selected currencies
-        base_rate = next((rate for rate in exchange_rates if rate['cur_unit'] == base_currency), None)
-        target_rate = next((rate for rate in exchange_rates if rate['cur_unit'] == target_currency), None)
-
-        if not base_rate or not target_rate:
-            return Response({"error": "Invalid currency codes"}, status=400)
-
-        return Response({
-            "base_currency": base_rate,
-            "target_currency": target_rate,
-        })
+        # Filter out only successful results (result == 1)
+        filtered_data = [item for item in data if item["result"] == 1]
+        
+        return JsonResponse({"success": True, "rates": filtered_data})
+    else:
+        return JsonResponse({"success": False, "error": "Failed to fetch exchange rates"})
     
-    except requests.RequestException as e:
-        return Response({"error": f"API request failed: {str(e)}"}, status=500)
+def convert_currency(request):
+    amount = float(request.GET.get("amount", 0))
+    from_currency = request.GET.get("from_currency", "USD")
+    to_currency = request.GET.get("to_currency", "KRW")
+    
+    API_KEY = "sCqdNQGIog1c8b451iW63Ji4dCeLW4hR"
+    BASE_URL = "https://www.koreaexim.go.kr/site/program/financial/exchangeJSON"
+    
+    today = datetime.now().strftime('%Y-%m-%d')
+    params = {
+        "authkey": API_KEY,
+        "searchdate": today,
+        "data": "AP01"
+    }
+    
+    response = requests.get(BASE_URL, params=params)
+    
+    if response.status_code == 200:
+        data = response.json()
+        rates = {item["cur_unit"]: float(item["deal_bas_r"].replace(",", "")) for item in data if item["result"] == 1}
+        
+        if from_currency not in rates or to_currency not in rates:
+            return JsonResponse({"success": False, "error": "Currency not supported"})
+        
+        # Perform conversion
+        converted_amount = (amount / rates[from_currency]) * rates[to_currency]
+        
+        return JsonResponse({
+            "success": True,
+            "converted_amount": round(converted_amount, 2),
+            "from_currency": from_currency,
+            "to_currency": to_currency
+        })
+    else:
+        return JsonResponse({"success": False, "error": "Failed to fetch exchange rates"})

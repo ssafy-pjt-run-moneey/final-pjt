@@ -60,6 +60,13 @@ const searchBanks = () => {
       result.forEach(place => {
         const position = new window.kakao.maps.LatLng(place.y, place.x)
         
+        // Create a custom marker image
+        const markerImage = new window.kakao.maps.MarkerImage(
+          '/gal.png',
+          new window.kakao.maps.Size(64, 69),
+          { offset: new window.kakao.maps.Point(27, 69) }
+        )
+        
         // Create marker
         const marker = new window.kakao.maps.Marker({
           map: map.value,
@@ -69,9 +76,10 @@ const searchBanks = () => {
         // Create infowindow
         const infowindow = new window.kakao.maps.InfoWindow({
           content: `
-            <div style="padding:5px;font-size:12px;">
+            <div style="padding:8px;font-size:15px;">
               ${place.place_name}<br>
-              ${place.address_name}
+              ${place.address_name}<br>
+              ${place.phone ? `${place.phone}<br>` : ''}<br>
             </div>
           `
         })

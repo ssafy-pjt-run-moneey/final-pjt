@@ -1,13 +1,15 @@
-import { createRouter, createWebHistory } from 'vue-router';
-import HomeView from '@/views/HomeView.vue'; // 홈 페이지 컴포넌트
-import SignUpView from '@/views/SignUpView.vue'; // 회원가입 페이지 컴포넌트
-import LogInView from '@/views/LogInView.vue'; // 로그인 페이지 컴포넌트
-import MyPageView from '@/views/MyPageView.vue';
-import TestView from '@/views/TestView.vue';
-import ProductsView from '@/views/ProductsView.vue';
-import CommunityView from '@/views/CommunityView.vue';
-import MapView from '@/views/MapView.vue';
-import ExchangeView from '@/views/ExchangeView.vue';
+import { createRouter, createWebHistory } from 'vue-router'
+import HomeView from '@/views/HomeView.vue'
+import SignUpView from '@/views/SignUpView.vue'
+import LogInView from '@/views/LogInView.vue'
+import MyPageView from '@/views/MyPageView.vue'
+import TestView from '@/views/TestView.vue'
+import ProductsView from '@/views/ProductsView.vue'
+import ArticlesView from '@/views/ArticlesView.vue'
+import DetailView from '@/views/DetailView.vue'
+import CreateView from '@/views/CreateView.vue'
+import MapView from '@/views/MapView.vue'
+import ExchangeView from '@/views/ExchangeView.vue'
 import { useCounterStore } from '@/stores/counter'
 
 const router = createRouter({
@@ -44,9 +46,19 @@ const router = createRouter({
       component: ProductsView,
     },
     {
-      path: '/community',
-      name: 'CommunityView',
-      component: CommunityView,
+      path: '/articles',
+      name: 'ArticlesView',
+      component: ArticlesView
+    },
+    {
+      path: '/articles/:id',
+      name: 'DetailView',
+      component: DetailView
+    },
+    {
+      path: '/create',
+      name: 'CreateView',
+      component: CreateView
     },
     {
       path: '/map',
