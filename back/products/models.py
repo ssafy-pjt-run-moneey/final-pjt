@@ -1,6 +1,5 @@
-# product/models.py
+# products/models.py
 from django.db import models
-from django.conf import settings
 
 class Product(models.Model):
     dcls_month = models.CharField(max_length=6)
@@ -13,24 +12,25 @@ class Product(models.Model):
     join_way = models.TextField()
     spcl_cnd = models.TextField()
 
+# products/models.py
 class Option(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='options')
     dcls_month = models.CharField(max_length=6)
     intr_rate_type_nm = models.CharField(max_length=100)
     intr_rate = models.FloatField()
     intr_rate2 = models.FloatField()
-    save_trm = models.IntegerField()
+    save_trm = models.IntegerField()  # 추가
 
 class ProductMark(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey('accounts.User', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = ('user', 'product')
 
 class ProductComment(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey('accounts.User', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     content = models.TextField()
     created_date = models.DateTimeField(auto_now_add=True)

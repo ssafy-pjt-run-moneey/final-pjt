@@ -15,7 +15,7 @@ urlpatterns = [
     path('api/runninggame/', include('runninggame.urls')),
     path('accounts/update_dog_type/', views.update_dog_type, name='update_dog_type'),
     # 금융 상품 관련 URL
-    path('api/v1/financial/', include('products.urls')),
+    path('api/v1/', include('products.urls')),
 ]
 
 if settings.DEBUG:

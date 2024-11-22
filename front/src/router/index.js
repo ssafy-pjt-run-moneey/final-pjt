@@ -11,8 +11,7 @@ import CreateView from '@/views/CreateView.vue'
 import MapView from '@/views/MapView.vue'
 import ExchangeView from '@/views/ExchangeView.vue'
 import { useCounterStore } from '@/stores/counter'
-import ProductDetailView from '@/views/ProductDetailView.vue'
-import MarkedProductsView from '@/views/MarkedProductsView.vue'
+import ProductDetailView from '@/views/ProductDetailView.vue' 
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -51,11 +50,6 @@ const router = createRouter({
       path: '/products/:id',
       name: 'ProductDetail',
       component: ProductDetailView
-    },
-    {
-      path: '/mypage/marked-products',
-      name: 'MarkedProducts',
-      component: MarkedProductsView
     },
     {
       path: '/articles',
@@ -99,10 +93,6 @@ router.beforeEach((to, from) => {
   if ((to.name === 'SignUpView' || to.name === 'LogInView') && (store.isLogin)) {
     window.alert('이미 로그인 되어있습니다.')
     return { name: 'ArticleView' }
-  }
-  if (to.name === 'MarkedProducts' && !store.isLogin) {
-    window.alert('로그인이 필요합니다.')
-    return { name: 'LogInView' }
   }
 })
 
