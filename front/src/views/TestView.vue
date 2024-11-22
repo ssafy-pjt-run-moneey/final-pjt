@@ -6,7 +6,7 @@
       방향키로 강아지🐶를 조작하고,<br>
       점프(↑)해 현재 답변에 닿으면<br>
       답변이 바뀝니다!
-    </p>
+      </p>
       <button @click="startGame">게임 시작</button>
     </div>
     <div v-else class="game-area">
@@ -216,6 +216,10 @@ const calculateResult = async () => {
     showResult.value = true
   } catch (error) {
     console.error('테스트 결과 제출 실패:', error)
+    // 에러 발생 시에도 결과를 표시합니다.
+    resultType.value = type
+    showQuestion.value = false
+    showResult.value = true
   }
 }
 

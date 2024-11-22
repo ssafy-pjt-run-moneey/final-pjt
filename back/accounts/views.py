@@ -70,3 +70,36 @@ def change_password(request):
     user.set_password(new_password)
     user.save()
     return Response({'message': '비밀번호가 성공적으로 변경되었습니다.'})
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def update_dog_type(request):
+    user = request.user
+    dog_type = request.data.get('dog_type')
+    
+    if dog_type is not None:
+        try:
+            dog_type = int(dog_type)
+            if 1 <= dog_type <= 16:
+                user.dog_type = dog_type
+                user.save()
+                return Response({
+                    'status': 'success',
+                    'message': 'Dog type updated successfully',
+                    'dog_type': dog_type
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response({
+                    'status': 'error',
+                    'message': 'Invalid dog type. Must be between 1 and 16.'
+                }, status=status.HTTP_400_BAD_REQUEST)
+        except ValueError:
+            return Response({
+                'status': 'error',
+                'message': 'Invalid dog type. Must be an integer.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return Response({
+            'status': 'error',
+            'message': 'Dog type is required.'
+        }, status=status.HTTP_400_BAD_REQUEST)

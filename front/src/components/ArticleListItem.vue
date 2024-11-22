@@ -1,21 +1,23 @@
 <template>
   <div>
-    <h5>{{ article.id }}</h5>
+    <router-link :to="{
+      name: 'ArticleDetailView',
+      params: {id: article.id }}">
     <p>{{ article.title }}</p>
-    <p>{{ article.content }}</p>
-    <RouterLink 
-      :to="{ name: 'DetailView', params: { id: article.id } }"  
-    >
-      Detail
-    </RouterLink>
+    </router-link>
     <hr>
   </div>
 </template>
 
-<script setup>
-import { RouterLink } from 'vue-router'
-
-defineProps({
-  article: Object
-})
+<script>
+export default {
+  name: 'ArticleListItem',
+  props: {
+    article: Object,
+  }
+}
 </script>
+
+<style>
+
+</style>

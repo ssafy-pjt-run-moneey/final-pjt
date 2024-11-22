@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'articles',
     'exchange',
     'runninggame',
+    'products',
+    'django_filters',
     # DRF
     'rest_framework',
     'rest_framework.authtoken',

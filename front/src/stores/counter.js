@@ -93,6 +93,7 @@ export const useCounterStore = defineStore('counter', () => {
       token.value = response.data.key
       localStorage.setItem('token', token.value)
       console.log('로그인 성공, 토큰:', token.value)
+      router.push({ name: 'HomeView' })
     } catch (error) {
       console.error('로그인 실패:', error)
     }
