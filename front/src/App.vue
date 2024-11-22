@@ -131,8 +131,6 @@ const navLinks = [
 .logo-container {
   display: flex;
   justify-content: center;
-  /* padding: 20px 0; */
-  margin-bottom: 30px;
 }
 
 .logo-img {
@@ -215,8 +213,6 @@ const navLinks = [
 .footer {
   background-color: #FFF8F3;
   color: #706873;
-  padding: 20px 0;
-  /* margin-top: 50px; */
   text-align: center;
 }
 

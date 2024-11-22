@@ -21,6 +21,9 @@ const vuetify = createVuetify({
   directives
 })
 
+
+
+// Vue.config.devtools = true;
 pinia.use(piniaPluginPersistedstate)
 // app.use(createPinia())
 app.use(pinia)

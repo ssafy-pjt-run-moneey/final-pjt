@@ -88,18 +88,13 @@ export const useCounterStore = defineStore('counter', () => {
       const response = await axios({
         method: 'post',
         url: `${API_URL}/accounts/login/`,
-        data: {
-          email: payload.email,
-          password: payload.password
-        }
+        data: payload
       })
-      token.value = response.data.access
-      localStorage.setItem('refresh_token', response.data.refresh)
-      console.log('로그인 성공')
-      router.push({ name: 'HomeView' })
+      token.value = response.data.key
+      localStorage.setItem('token', token.value)
+      console.log('로그인 성공, 토큰:', token.value)
     } catch (error) {
-      console.error('로그인 실패:', error.response?.data)
-      throw error
+      console.error('로그인 실패:', error)
     }
   }
 
@@ -170,16 +165,33 @@ export const useCounterStore = defineStore('counter', () => {
         method: 'post',
         url: `${API_URL}/api/runninggame/test/submit_test/`,
         headers: {
-          Authorization: `Bearer ${token.value}`
+          Authorization: `Token ${token.value}`
         },
-        data: {
-          answers: payload.answers,
-          result_type: payload.result_type
-        }
+        data: payload
       })
+      console.log('테스트 결과 제출 성공:', response.data)
       return response.data
     } catch (error) {
       console.error('테스트 결과 제출 실패:', error)
+      throw error
+    }
+  }
+  
+  const updateUserDogType = async (dogType) => {
+    try {
+      const response = await axios({
+        method: 'patch',
+        url: `${API_URL}/accounts/update_dog_type/`,
+        headers: {
+          Authorization: `Token ${token.value}`
+        },
+        data: {
+          dog_type: dogType
+        }
+      })
+      console.log('유저 dog_type 업데이트 성공:', response.data)
+    } catch (error) {
+      console.error('유저 dog_type 업데이트 실패:', error)
       throw error
     }
   }
@@ -194,6 +206,7 @@ export const useCounterStore = defineStore('counter', () => {
     handleSignUpError,
     submitTest,
     submitTestResult,
+    updateUserDogType,
     getArticles
    }
 }, { persist: true })

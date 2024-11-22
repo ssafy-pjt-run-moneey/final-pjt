@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from .serializers import UserSerializer
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth import get_user_model
 
 @api_view(['POST'])
 def register(request):
@@ -31,21 +32,30 @@ def signup_view(request):
 
 @api_view(['POST'])
 def login_view(request):
-    username = request.data.get('username')
+    email = request.data.get('email')
     password = request.data.get('password')
-    user = authenticate(username=username, password=password)
+    user = authenticate(request, email=email, password=password)
     
-    if user:
+    if user is not None:
+        login(request, user)
         refresh = RefreshToken.for_user(user)
         return Response({
-            'key': str(refresh.access_token)  # Vue store에서 key로 받고 있으므로 변경
-        })
-    return Response({'error': '아이디 또는 비밀번호가 잘못되었습니다.'}, status=400)
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+        }, status=status.HTTP_200_OK)
+    else:
+        return Response({'error': '이메일 또는 비밀번호가 잘못되었습니다.'}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def logout_view(request):
-    # 로그아웃 로직 (토큰 블랙리스트 등) 필요 시 구현
-    return Response(status=status.HTTP_204_NO_CONTENT)
+    try:
+        refresh_token = request.data["refresh"]
+        token = RefreshToken(refresh_token)
+        token.blacklist()
+        return Response(status=status.HTTP_205_RESET_CONTENT)
+    except Exception as e:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])

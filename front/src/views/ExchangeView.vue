@@ -1,202 +1,237 @@
 <template>
   <div class="exchange-calculator">
-    <!-- <h1>어디로 떠나세요?</h1> -->
-
-    <!-- Conversion Form -->
-    <div class="form-container">
-      <div class="form-group">
-        <label for="base-currency">From:</label>
-        <select v-model="baseCurrency" id="base-currency">
-          <option v-for="rate in rates" :key="rate.cur_unit" :value="rate.cur_unit">
-            {{ rate.cur_nm }} ({{ rate.cur_unit }})
-          </option>
+    <div class="current-rate" v-if="amount && convertedAmount">
+      {{ amount }} {{ formatCurrencyCode(fromCurrency) }} = {{ convertedAmount }} {{ formatCurrencyCode(toCurrency) }}
+      <div class="update-time">{{ lastUpdated }}</div>
+    </div>
+    <div class="conversion-form">
+      <div class="input-group">
+        <input 
+          type="number" 
+          v-model.number="amount" 
+          @input="forwardConversion"
+          placeholder="Enter amount"
+        />
+        <select v-model="fromCurrency" @change="forwardConversion">
+          <option value="KRW">대한민국 원 (KRW)</option>
         </select>
       </div>
 
-      <div class="form-group">
-        <label for="amount">Amount:</label>
-        <input type="number" id="amount" v-model.number="amount" placeholder="Enter amount" />
-      </div>
-
-      <div class="form-group">
-        <label for="target-currency">To:</label>
-        <select v-model="targetCurrency" id="target-currency">
-          <option v-for="rate in rates" :key="rate.cur_unit" :value="rate.cur_unit">
-            {{ rate.cur_nm }} ({{ rate.cur_unit }})
+      <div class="input-group">
+        <input 
+          type="number" 
+          v-model.number="convertedAmount" 
+          @input="reverseConversion"
+          placeholder="Enter amount"
+        />
+        <select v-model="toCurrency" @change="forwardConversion">
+          <option v-for="currency in currencies" 
+                  :key="currency.cur_unit" 
+                  :value="currency.cur_unit">
+            {{ currency.cur_nm }} ({{ formatCurrencyCode(currency.cur_unit) }})
           </option>
         </select>
       </div>
-
-      <button class="action-button" @click="convertCurrency">Convert</button>
-    </div>
-
-    <!-- Conversion Result -->
-    <div v-if="convertedAmount !== null" class="result-container">
-      <p>{{ amount }} {{ baseCurrency }} = {{ convertedAmount }} {{ targetCurrency }}</p>
-    </div>
-
-    <!-- Error Message -->
-    <div v-if="errorMessage" class="error-message">
-      <p>{{ errorMessage }}</p>
     </div>
   </div>
 </template>
 
 <script>
-import axios from "axios";
+import axios from 'axios';
 
 export default {
-  name: "ExchangeCalculator",
+  name: 'ExchangeCalculator',
   data() {
     return {
-      rates: [], // Holds exchange rate data
-      baseCurrency: "USD", // Default base currency
-      targetCurrency: "KRW", // Default target currency
-      amount: 1, // Amount to convert
-      convertedAmount: null, // Result of the conversion
-      errorMessage: null, // Error message if something goes wrong
-    };
+      amount: 1000,
+      convertedAmount: 0,
+      fromCurrency: 'KRW',
+      toCurrency: 'USD',
+      currencies: [],
+      lastUpdated: '',
+      selectedRate: null
+    }
   },
   mounted() {
     this.fetchExchangeRates();
   },
   methods: {
-    // Fetch exchange rates and handle '(100)' logic
-    fetchExchangeRates() {
-      axios
-        .get("/api/v1/exchange/get/") // Replace with your Django API endpoint
-        .then((response) => {
-          if (response.data.success) {
-            this.rates = response.data.rates.map((item) => {
-              const isHundredUnit = item.cur_unit.includes("(100)");
-              return {
-                cur_unit: isHundredUnit ? item.cur_unit.replace("(100)", "").trim() : item.cur_unit,
-                deal_bas_r: parseFloat(item.deal_bas_r.replace(",", "")) * (isHundredUnit ? 1 : 1000000),
-                cur_nm: item.cur_nm,
-              };
-            });
-            this.baseCurrency = "KRW";
-            this.targetCurrency = "JPY";
-          } else {
-            this.errorMessage = "Failed to load exchange rates.";
+    async fetchExchangeRates() {
+      try {
+        const response = await axios.get('/api/v1/exchange/get/');
+        if (response.data.success) {
+          this.currencies = response.data.rates;
+          this.updateConversion();
+          const date = new Date();
+          this.lastUpdated = `${date.toLocaleDateString()} ${date.toLocaleTimeString()} UTC`;
+        }
+      } catch (error) {
+        console.error('Failed to fetch rates:', error);
+      }
+    },
+    async updateConversion() {
+      if (!this.amount) return;
+      
+      try {
+        const response = await axios.get('/api/v1/exchange/convert/', {
+          params: {
+            amount: this.amount,
+            from_currency: this.fromCurrency,
+            to_currency: this.toCurrency
           }
-        })
-        .catch(() => {
-          this.errorMessage = "An error occurred while fetching exchange rates.";
         });
-    },
-
-    // Convert currency based on selected options
-    convertCurrency() {
-      if (!this.amount || !this.baseCurrency || !this.targetCurrency) {
-        this.errorMessage = "Please fill out all fields.";
-        return;
-      }
-
-      const baseRate = this.getRate(this.baseCurrency);
-      const targetRate = this.getRate(this.targetCurrency);
-
-      if (baseRate && targetRate) {
-        const isBaseHundredUnit = this.isHundredUnit(this.baseCurrency);
-        const isTargetHundredUnit = this.isHundredUnit(this.targetCurrency);
-
-        const adjustedBaseRate = isBaseHundredUnit ? baseRate / 100 : baseRate;
-        const adjustedTargetRate = isTargetHundredUnit ? targetRate / 100 : targetRate;
-
-        // Perform conversion
-        this.convertedAmount = ((this.amount / adjustedBaseRate) * adjustedTargetRate).toFixed(2);
-        this.errorMessage = null; // Clear any previous errors
-      } else {
-        this.errorMessage = "Invalid currency selected.";
+        
+        if (response.data.success) {
+          this.convertedAmount = response.data.converted_amount;
+          this.selectedRate = this.calculateRate();
+        }
+      } catch (error) {
+        console.error('Conversion failed:', error);
       }
     },
-
-    // Helper function to get the deal_bas_r (base rate) for a given currency code
-    getRate(currencyCode) {
-      const rateObj = this.rates.find((rate) => rate.cur_unit === currencyCode);
-      return rateObj ? rateObj.deal_bas_r : null;
-    },
-
-    // Helper function to check if a currency uses '(100)'
-    isHundredUnit(currencyCode) {
-      return this.rates.some((rate) => rate.cur_unit === currencyCode && rate.deal_bas_r >= 10000);
-    },
+  formatCurrencyCode(code) {
+    return code.replace('(100)', '');
   },
-};
+  calculateRate() {
+      const fromRate = this.currencies.find(c => c.cur_unit === this.fromCurrency);
+      const toRate = this.currencies.find(c => c.cur_unit === this.toCurrency);
+      
+      if (fromRate && toRate) {
+        const fromValue = parseFloat(fromRate.deal_bas_r.replace(",", ""));
+        const toValue = parseFloat(toRate.deal_bas_r.replace(",", ""));
+        
+        let rate = toValue / fromValue;
+        
+        // Adjust rate for currencies with (100) notation
+        if (fromRate.cur_unit.includes('(100)')) {
+          rate = rate * 100;
+        }
+        if (toRate.cur_unit.includes('(100)')) {
+          rate = rate / 100;
+        }
+        
+        return rate.toFixed(5);
+      }
+      return null;
+    },
+
+    async updateConversion() {
+      if (!this.amount) return;
+      
+      try {
+        const response = await axios.get('/api/v1/exchange/convert/', {
+          params: {
+            amount: this.amount,
+            from_currency: this.fromCurrency,
+            to_currency: this.toCurrency
+          }
+        });
+        
+        if (response.data.success) {
+          // For currencies with (100), adjust the display
+          if (this.toCurrency.includes('(100)')) {
+            this.convertedAmount = (response.data.converted_amount * 100).toFixed(2);
+          } else {
+            this.convertedAmount = response.data.converted_amount;
+          }
+          this.selectedRate = this.calculateRate();
+        }
+      } catch (error) {
+        console.error('Conversion failed:', error);
+      }
+    },
+    // 위쪽 입력창에서 계산 (KRW → 외화)
+    async forwardConversion() {
+      if (!this.amount) return;
+      
+      const toRate = this.currencies.find(c => c.cur_unit === this.toCurrency);
+      if (toRate) {
+        const rate = parseFloat(toRate.deal_bas_r.replace(",", ""));
+        const mod = this.toCurrency.includes('(100)') ? 100 : 1;
+        
+        // 원화 금액 / 해당 통화의 deal_bas_r × mod값
+        this.convertedAmount = ((this.amount / rate) * mod).toFixed(2);
+        this.selectedRate = (1 / rate * mod).toFixed(5);
+      }
+    },
+
+    // 아래쪽 입력창에서 계산 (외화 → KRW)
+    async reverseConversion() {
+      if (!this.convertedAmount) return;
+      
+      const toRate = this.currencies.find(c => c.cur_unit === this.toCurrency);
+      if (toRate) {
+        const rate = parseFloat(toRate.deal_bas_r.replace(",", ""));
+        const mod = this.toCurrency.includes('(100)') ? 100 : 1;
+        
+        // 외화 금액 × 해당 통화의 deal_bas_r / mod값
+        this.amount = (this.convertedAmount * rate / mod).toFixed(2);
+        this.selectedRate = (1 / rate * mod).toFixed(5);
+      }
+    }
+  }
+}
 </script>
 
 <style scoped>
 .exchange-calculator {
-  padding: 40px;
-  background-color: #FFF8F3; /* Match homepage background */
-  max-width: 600px; /* Narrower container */
+  max-width: 400px;
   margin: 0 auto;
-  border-radius: 20px;
+  padding: 20px;
 }
 
-h1 {
+.current-rate {
   text-align: center;
-  font-size: 2rem;
-  color: #706873; /* Match button color */
-}
-
-.form-container {
-  display: flex;
-  flex-direction: column;
-}
-
-.form-group {
+  font-size: 1.2em;
   margin-bottom: 20px;
 }
 
-label {
-  font-weight: bold;
-  color: #706873; /* Match button color */
+.update-time {
+  font-size: 0.8em;
+  color: #666;
+  margin-top: 5px;
 }
 
-/* Ensure consistent styling for all input fields and dropdowns */
-input,
+.conversion-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.input-group {
+  display: flex;
+  gap: 10px;
+}
+
+input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #d3d3d3;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
 select {
-  width: calc(100% - 20px); /* Consistent width with slight inner padding */
-  padding: 10px;
-  border-radius: 12px; /* Rounded corners like the button */
-  border: none; /* Remove default borders */
-  background-color: #f9f9f9; /* Light background for inputs */
-  box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  padding: 8px;
+  border: 1px solid #d3d3d3;
+  border-radius: 6px;
+  font-size: 14px;
+  min-width: 150px;
 }
 
-/* Add focus effect for better UX */
 input:focus,
 select:focus {
-  outline: none; /* Remove default focus outline */
-  box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2); /* Slightly stronger shadow on focus */
+  outline: none;
+  border-color: #706873;
 }
 
-/* Style the button to match inputs but without a border */
-button.action-button {
-  background-color: #a5a58d; /* Match homepage button style */
-  color: white;
-  border-radius: 12px;
-  width: 40%;
-  margin: 0 auto;
-  margin-top: 18px;
-  height: 38px;
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
-button.action-button:hover {
-  background-color: #797967; /* Hover effect */
-}
-
-.result-container,
-.error-message {
-  text-align: center;
-}
-
-.result-container p {
-  font-size: 1.5rem;
-}
-
-.error-message p {
-  color: red;
+input[type=number] {
+  -moz-appearance: textfield;
 }
 </style>

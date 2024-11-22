@@ -2,18 +2,21 @@
   <div class="game-container">
     <div v-if="!gameStarted" class="start-screen">
       <h2>달려라 멍니! 성향 테스트</h2>
-      <p>방향키로 강아지를 조작하고, 질문 영역에 닿으면 (O)를 선택합니다!</p>
+      <p>
+      방향키로 강아지🐶를 조작하고,<br>
+      점프(↑)해 현재 답변에 닿으면<br>
+      답변이 바뀝니다!
+    </p>
       <button @click="startGame">게임 시작</button>
     </div>
-
     <div v-else class="game-area">
       <img class="dog" :style="dogStyle" src="/dogs/default/running.gif" alt="Running Dog">
-      
-      <div v-if="showQuestion" class="question-modal">
-        <h3>{{ questions[currentQuestionIndex].text }}</h3>
+      <div v-if="showQuestion && currentQuestionIndex < questions.length" class="question-modal">
+        <h3 class="question-text" v-html="questions[currentQuestionIndex].text"></h3>
         <div class="timer">{{ timer }}</div>
+        <div class="answer">현재 답변: {{ currentAnswer }}</div>
       </div>
-
+      <div class="answer-summary">{{ answerSummary }}</div>
       <div v-if="showResult" class="result-modal">
         <div class="modal-content">
           <h2>당신의 투자 성향은...</h2>
@@ -39,29 +42,46 @@ const gameStarted = ref(false)
 const showQuestion = ref(false)
 const showResult = ref(false)
 const currentQuestionIndex = ref(0)
-const answers = ref([])
+const answers = ref(['?', '?', '?', '?'])
 const resultType = ref(null)
-const timer = ref(3)
+const timer = ref(5)
+const currentAnswer = ref('X')
+const timerInterval = ref(null)
 
-const dogPosition = reactive({ 
-  x: 50, 
-  y: 300, 
-  velocityX: 0,
-  velocityY: 0,
-  isJumping: false
+const gameState = reactive({
+  dog: {
+    x: 50,
+    y: 285,
+    width: 60,
+    height: 60,
+    speed: 5,
+    isJumping: false,
+    jumpPower: 12,
+    gravity: 0.6,
+    velocityX: 0,
+    velocityY: 0
+  },
+  background: {
+    x: 0,
+    speed: 3
+  }
 })
 
 const dogStyle = computed(() => ({
-  left: `${dogPosition.x}px`,
-  top: `${dogPosition.y}px`,
-  transform: `translateY(${dogPosition.velocityY}px)`
+  left: `${gameState.dog.x}px`,
+  top: `${gameState.dog.y}px`,
+  transform: `translateY(${gameState.dog.velocityY}px)`
 }))
 
+const answerSummary = computed(() => 
+  answers.value.map(a => a === '?' ? '?' : (a === 'O' ? 'O' : 'X')).join(' ')
+)
+
 const questions = [
-  { text: "안정적인 수익보다 높은 수익을 선호하시나요?" },
-  { text: "6개월 이상의 장기 저축을 선호하시나요?" },
-  { text: "정기적인 저축보다 자유로운 투자를 선호하시나요?" },
-  { text: "목표 금액을 정해두고 계획적으로 모으시나요?" }
+  { text: "Q1. 안정적인 수익보다 <br>높은 수익을 선호하시나요?" },
+  { text: "Q2. 6개월 이상의 장기 저축을 <br>선호하시나요?" },
+  { text: "Q3. 정기적인 저축보다 <br>자유로운 투자를 선호하시나요?" },
+  { text: "Q4. 목표 금액을 정해두고 <br>계획적으로 모으시나요?" }
 ]
 
 const dogTypes = {
@@ -72,9 +92,17 @@ const dogTypes = {
 }
 
 const dogDescriptions = {
-  1: '보수적이면서 안정적인 장기형', 2: '안전 선호하나 단기 수익 추구형',
+  1: '보수적이면서 안정적인 장기형',
+  2: '안전 선호하나 단기 수익 추구형',
   // ... (다른 설명들)
 }
+
+const questionBox = reactive({
+  x: 350,
+  y: 20,
+  width: 100,
+  height: 80
+})
 
 const startGame = () => {
   gameStarted.value = true
@@ -84,6 +112,8 @@ const startGame = () => {
 const showNextQuestion = () => {
   if (currentQuestionIndex.value < questions.length) {
     showQuestion.value = true
+    currentAnswer.value = 'X'
+    answers.value[currentQuestionIndex.value] = 'X'
     startTimer()
   } else {
     calculateResult()
@@ -92,11 +122,11 @@ const showNextQuestion = () => {
 
 const startTimer = () => {
   timer.value = 5
-  const interval = setInterval(() => {
+  timerInterval.value = setInterval(() => {
     timer.value--
     if (timer.value === 0) {
-      clearInterval(interval)
-      selectAnswer('X')
+      clearInterval(timerInterval.value)
+      selectAnswer(currentAnswer.value)
     }
   }, 1000)
 }
@@ -106,62 +136,87 @@ const updateDogPosition = () => {
   const gravity = 0.6
   const groundLevel = 300
 
-  dogPosition.x += dogPosition.velocityX
-  dogPosition.velocityX *= friction
+  gameState.dog.x += gameState.dog.velocityX
+  gameState.dog.velocityX *= friction
 
-  if (dogPosition.isJumping) {
-    dogPosition.y += dogPosition.velocityY
-    dogPosition.velocityY += gravity
+  if (gameState.dog.isJumping) {
+    gameState.dog.y += gameState.dog.velocityY
+    gameState.dog.velocityY += gravity
 
-    if (dogPosition.y >= groundLevel) {
-      dogPosition.y = groundLevel
-      dogPosition.isJumping = false
-      dogPosition.velocityY = 0
+    if (gameState.dog.y >= groundLevel) {
+      gameState.dog.y = groundLevel
+      gameState.dog.isJumping = false
+      gameState.dog.velocityY = 0
     }
   }
 
-  // 질문 영역 충돌 검사
-  if (showQuestion.value && dogPosition.x > 700) {
-    selectAnswer('O')
-  }
-
-  dogPosition.x = Math.max(0, Math.min(740, dogPosition.x))
-  dogPosition.y = Math.max(0, Math.min(300, dogPosition.y))
+  gameState.dog.x = Math.max(0, Math.min(740, gameState.dog.x))
+  gameState.dog.y = Math.max(0, Math.min(300, gameState.dog.y))
 
   requestAnimationFrame(updateDogPosition)
+}
+
+// toggleAnswer 함수 수정
+const toggleAnswer = () => {
+  currentAnswer.value = currentAnswer.value === 'O' ? 'X' : 'O'
+  answers.value[currentQuestionIndex.value] = currentAnswer.value
 }
 
 const handleKeyPress = (e) => {
   e.preventDefault()
   const acceleration = 2
   switch(e.code) {
-    case 'ArrowUp': jump(); break
-    case 'ArrowDown': dogPosition.velocityY = Math.min(10, dogPosition.velocityY + acceleration); break
-    case 'ArrowLeft': dogPosition.velocityX = Math.max(-10, dogPosition.velocityX - acceleration); break
-    case 'ArrowRight': dogPosition.velocityX = Math.min(10, dogPosition.velocityX + acceleration); break
+    case 'ArrowUp':
+      jump()
+      break
+    case 'ArrowDown':
+      gameState.dog.velocityY = Math.min(10, gameState.dog.velocityY + acceleration)
+      break
+    case 'ArrowLeft':
+      gameState.dog.velocityX = Math.max(-10, gameState.dog.velocityX - acceleration)
+      break
+    case 'ArrowRight':
+      gameState.dog.velocityX = Math.min(10, gameState.dog.velocityX + acceleration)
+      break
   }
 }
 
 const jump = () => {
-  if (!dogPosition.isJumping) {
-    dogPosition.isJumping = true
-    dogPosition.velocityY = -15
+  if (!gameState.dog.isJumping) {
+    gameState.dog.isJumping = true
+    gameState.dog.velocityY = -15
+
+    if (showQuestion.value && gameState.dog.x + gameState.dog.width > questionBox.x && 
+        gameState.dog.x < questionBox.x + questionBox.width &&
+        gameState.dog.y + gameState.dog.height >= questionBox.y + questionBox.height) {
+      setTimeout(() => {
+        toggleAnswer()
+      }, 200)
+    }
   }
 }
 
-const selectAnswer = (answer) => {
-  answers.value.push(answer)
-  showQuestion.value = false
+const selectAnswer = () => {
   currentQuestionIndex.value++
-  setTimeout(() => showNextQuestion(), 1000)
+  if (currentQuestionIndex.value < questions.length) {
+    showNextQuestion()
+  } else {
+    calculateResult()
+  }
 }
 
 const calculateResult = async () => {
   const binary = answers.value.map(a => a === 'O' ? '1' : '0').join('')
   const type = parseInt(binary, 2) + 1
-  await store.submitTestResult({ answers: answers.value, result_type: type })
-  resultType.value = type
-  showResult.value = true
+  try {
+    await store.submitTestResult({ answers: answers.value, result_type: type })
+    await store.updateUserDogType(type)
+    resultType.value = type
+    showQuestion.value = false
+    showResult.value = true
+  } catch (error) {
+    console.error('테스트 결과 제출 실패:', error)
+  }
 }
 
 const restartGame = () => {
@@ -169,13 +224,13 @@ const restartGame = () => {
   showQuestion.value = false
   showResult.value = false
   currentQuestionIndex.value = 0
-  answers.value = []
+  answers.value = ['?', '?', '?', '?']
   resultType.value = null
-  dogPosition.x = 50
-  dogPosition.y = 300
-  dogPosition.velocityX = 0
-  dogPosition.velocityY = 0
-  dogPosition.isJumping = false
+  gameState.dog.x = 50
+  gameState.dog.y = 300
+  gameState.dog.velocityX = 0
+  gameState.dog.velocityY = 0
+  gameState.dog.isJumping = false
 }
 
 onMounted(() => {
@@ -185,6 +240,9 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeyPress)
+  if (timerInterval.value) {
+    clearInterval(timerInterval.value)
+  }
 })
 </script>
 
@@ -212,7 +270,7 @@ onUnmounted(() => {
   transition: all 0.1s ease;
 }
 
-.start-screen, .question-modal, .result-modal {
+.start-screen, .result-modal {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -223,9 +281,38 @@ onUnmounted(() => {
   text-align: center;
 }
 
+.question-modal {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.9);
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.question-text {
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+.answer-summary {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
 .result-modal {
   width: 80%;
   max-width: 500px;
+  background: rgba(255, 255, 255, 0.95);
+  z-index: 1000;
 }
 
 .dog-result img {
@@ -252,6 +339,11 @@ button:hover {
 .timer {
   font-size: 24px;
   font-weight: bold;
+  margin-top: 10px;
+}
+
+.answer {
+  font-size: 18px;
   margin-top: 10px;
 }
 </style>
