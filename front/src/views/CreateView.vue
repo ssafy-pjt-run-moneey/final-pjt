@@ -23,13 +23,18 @@
 <script>
 import axios from 'axios'
 const API_URL = 'http://127.0.0.1:8000'
+import { useCounterStore } from '@/stores/counter'
 
 export default {
   name: 'CreateView',
+  setup() {
+    const store = useCounterStore()
+    return { store }
+  },
   data() {
     return {
-      title: null,
-      content: null,
+      title: '',
+      content: ''
     }
   },
   methods: {
@@ -38,28 +43,38 @@ export default {
       const content = this.content
 
       if (!title) {
-        alert('제목 입력해주세요')
+        alert('제목을 입력해주세요')
         return
       } else if (!content){
-        alert('내용 입력해주세요')
+        alert('내용을 입력해주세요')
         return
       }
+
+      const token = this.store.token
+      if (!token) {
+        alert('로그인이 필요합니다')
+        this.$router.push('/login')
+        return
+      }
+
       axios({
         method: 'post',
         url: `${API_URL}/articles/`,
-        headers:{
-          Authorization: `Token ${this.$store.state.token}`
+        headers: {
+          Authorization: `Token ${token}`
         },
-
-        data: { title, content},
-        
+        data: { title, content },
       })
       .then(() => {
-        // console.log(res)
-        this.$router.push({name: 'article'})
+        this.$router.push({name: 'ArticlesView'})
       })
       .catch((err) => {
         console.log(err)
+        if (err.response && err.response.status === 401) {
+          alert('인증에 실패했습니다. 다시 로그인해주세요.')
+          this.store.logOut()
+          this.$router.push('/login')
+        }
       })
     }
   }

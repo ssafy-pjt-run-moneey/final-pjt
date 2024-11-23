@@ -7,29 +7,27 @@
 </template>
 
 <script>
+import { ref, computed, onMounted } from 'vue'
+import { useCounterStore } from '@/stores/counter'
 import ArticleList from '@/components/ArticleList.vue'
-import { mapGetters, mapActions } from 'vuex'
 
 export default {
   name: 'ArticleView',
   components: {
     ArticleList,
   },
-  computed: {
-    ...mapGetters(['isLogin'])
-  },
-  created() {
-    this.getArticles()
-  },
-  methods: {
-    ...mapActions(['getArticles']),
-    fetchArticles() {
-      if (this.isLogin) {
-        this.getArticles()
-      } else {
-        alert('로그인이 필요한 페이지입니다...')
-        this.$router.push({ name: 'loginView' })
-      }
+  setup() {
+    const store = useCounterStore()
+    
+    const isLogin = computed(() => store.isLogin)
+    
+    onMounted(() => {
+      store.getArticles()
+    })
+
+    return {
+      isLogin,
+      getArticles: store.getArticles
     }
   }
 }

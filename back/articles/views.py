@@ -77,7 +77,8 @@ def comment_create(request, article_pk):
     if serializer.is_valid(raise_exception=True):
         serializer.save(article=article, user=request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
+    
+    
 # @api_view(['POST'])
 # #해당유저가 로그인되있는지 확인하는 데코?s,
 # def likes(request, article_pk):

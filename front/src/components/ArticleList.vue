@@ -34,6 +34,7 @@
 
 <script>
 import axios from 'axios'
+import { useCounterStore } from '@/stores/counter'
 
 export default {
   name: 'ArticleList',
@@ -43,38 +44,54 @@ export default {
       alert: false,
     }
   },
-  computed:{
+  computed: {
     isLogin() {
-      return this.$store.getters.isLogin
+      return this.store.isLogin
     },
+  },
+  setup() {
+    const store = useCounterStore()
+    return { store }
   },
   methods: {
     getArticles() {
       const API_URL = 'http://127.0.0.1:8000'
-      const token = this.$store.state.token
+      const token = this.store.token
+      if (!token) {
+        console.log('토큰이 없습니다. 로그인이 필요합니다.')
+        this.$router.push('/login')
+        return
+      }
       axios
         .get(`${API_URL}/articles/`, {
-          // headers:{
-         //Authorization: `Token ${this.$store.state.token}`
-        // },
+          headers: {
+            Authorization: `Token ${token}`
+          }
         })
         .then((response) => {
           this.articles = response.data
-          console.log(response.data)
         })
         .catch((error) => {
           console.log(error)
+          if (error.response && error.response.status === 401) {
+            console.log('인증에 실패했습니다. 다시 로그인해주세요.')
+            this.store.logOut()
+            this.$router.push('/login')
+          }
         })
     },
-    check(article){
+    check(article) {
       this.$router.push({
-        name: 'ArticleDetailView',
+        name: 'DetailView',
         params: { id: article.id }
       });
     },
-    createArticle(){
-      if (this.isLogin) {this.$router.push({name: 'CreateView'})}
-      else { alert('로그인을 해주세요') }
+    createArticle() {
+      if (this.isLogin) {
+        this.$router.push({name: 'CreateView'})
+      } else { 
+        alert('로그인을 해주세요') 
+      }
     }
   },
   created() {

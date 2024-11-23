@@ -7,32 +7,19 @@ export const useCounterStore = defineStore('counter', () => {
   const API_URL = 'http://127.0.0.1:8000'
   const token = ref(null)
   const router = useRouter()
-  // const isLogin = computed(() => {
-  //   if (token.value === null) {
-  //     return false
-  //   } else {
-  //     return true
-  //   }
-  // })
-  // const router = useRouter()
 
   // DRF로 전체 게시글 요청을 보내고 응답을 받아 articles에 저장하는 함수
-  const getArticles = function () {
-    axios({
-      method: 'get',
-      url: `${API_URL}/api/v1/articles/`,
-      headers: {
-        Authorization: `Token ${token.value}`
-      }
-    })
-      .then((res) => {
-        // console.log(res.data)
-        articles.value = res.data
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-  }
+  const getArticles = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/articles/`, {
+        headers: { Authorization: `Token ${token.value}` }
+      });
+      // 여기서 articles 상태를 업데이트합니다
+      // 예: articles.value = response.data;
+    } catch (error) {
+      console.error('게시글 목록을 가져오는데 실패했습니다:', error);
+    }
+  };
 
   // 회원가입 요청 액션
   const isLogin = computed(() => {
@@ -201,6 +188,7 @@ export const useCounterStore = defineStore('counter', () => {
     API_URL,
     token,
     isLogin,
+    getArticles,
     signUp,
     logIn,
     logOut,
