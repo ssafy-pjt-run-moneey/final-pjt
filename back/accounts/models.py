@@ -8,10 +8,21 @@ class UserManager(BaseUserManager):
         email = self.normalize_email(email)
         user = self.model(email=email, username=username, **extra_fields)
         user.set_password(password)
-        # 기본 프로필 이미지 설정
         user.profile_img = 'profiles/0.png'
         user.save(using=self._db)
         return user
+
+    def create_superuser(self, email, username, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('is_active', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser must have is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser must have is_superuser=True.')
+
+        return self.create_user(email, username, password, **extra_fields)
 
 class User(AbstractBaseUser):
     email = models.EmailField(unique=True)
@@ -22,11 +33,22 @@ class User(AbstractBaseUser):
     password2 = models.CharField(max_length=128)  # 비밀번호 확인용
     created_date = models.DateTimeField(auto_now_add=True)  # ERD의 created_date 필드
     updated_date = models.DateTimeField(auto_now=True)  # ERD의 updated_date 필드
-
+    followers = models.ManyToManyField('self', symmetrical=False, related_name='following', blank=True)
     objects = UserManager()
+    
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
+
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
+
+    def has_perm(self, perm, obj=None):
+        return self.is_superuser
+
+    def has_module_perms(self, app_label):
+        return self.is_superuser
 
     def update_dog_type(self, test_result):
         """테스트 결과에 따라 one_type 업데이트"""

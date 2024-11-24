@@ -29,3 +29,20 @@ class UserSerializer(serializers.ModelSerializer):
             password=password
         )
         return user
+    
+from rest_framework import serializers
+from .models import User
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            'id', 
+            'email', 
+            'username', 
+            'profile_img',
+            'dog_type',
+            'created_date',
+            'updated_date'
+        ]
+        read_only_fields = ['email', 'created_date', 'updated_date']

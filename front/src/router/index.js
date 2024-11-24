@@ -31,6 +31,15 @@ const router = createRouter({
       path: '/mypage',
       name: 'MyPageView',
       component: MyPageView,
+      meta: { requiresAuth: true },
+      beforeEnter: (to, from, next) => {
+        const store = useCounterStore()
+        if (!store.isLogin) {
+          next('/login')
+        } else {
+          next()
+        }
+      }
     },
     {
       path: '/login',
@@ -87,14 +96,23 @@ const router = createRouter({
 
 router.beforeEach((to, from) => {
   const store = useCounterStore()
-  if (to.name === 'ArticlesView' && !store.isLogin) {
+  // 인증이 필요한 페이지에 대한 가드
+  if (to.meta.requiresAuth && !store.isLogin) {
     window.alert('로그인이 필요합니다.')
     return { name: 'LogInView' }
   }
 
-  if ((to.name === 'SignUpView' || to.name === 'LogInView') && (store.isLogin)) {
+  // 이미 로그인한 사용자의 로그인/회원가입 페이지 접근 제한
+  if ((to.name === 'SignUpView' || to.name === 'LogInView') && store.isLogin) {
     window.alert('이미 로그인 되어있습니다.')
     return { name: 'ArticlesView' }
   }
+
+  // ArticlesView 접근 제한
+  if (to.name === 'ArticlesView' && !store.isLogin) {
+    window.alert('로그인이 필요합니다.')
+    return { name: 'LogInView' }
+  }
 })
 export default router
+

@@ -1,11 +1,21 @@
 <template>
   <div v-if="product" class="product-detail">
     <div class="product-header">
-      <h1>{{ product.fin_prdt_nm }}</h1>
-      <span class="product-type-badge">
-        {{ product.product_type === 'deposit' ? '예금' : '적금' }}
-      </span>
+      <div class="header-content">
+        <h1>{{ product.fin_prdt_nm }}</h1>
+        <span class="product-type-badge">
+          {{ product.product_type === 'deposit' ? '예금' : '적금' }}
+        </span>
+      </div>
+      <button 
+        class="mark-button" 
+        :class="{ marked: product.is_marked }" 
+        @click="handleMark(product)"
+      >
+        {{ product.is_marked ? '마킹 취소🐾' : '마킹하기🐾' }}
+      </button>
     </div>
+    
 
     <div class="info-card">
       <div class="info-item">
@@ -117,6 +127,21 @@ const chartData = computed(() => {
   }
 })
 
+const handleMark = async (product) => {
+  const token = localStorage.getItem('token')
+  if (!token) {
+    alert('로그인이 필요한 서비스입니다.')
+    router.push('/login')
+    return
+  }
+
+  try {
+    await financeStore.toggleMark(product.fin_prdt_cd)
+  } catch (error) {
+    console.error('마킹 처리 실패:', error)
+  }
+}
+
 const chartOptions = computed(() => ({
   responsive: true,
   scales: {
@@ -149,6 +174,7 @@ onMounted(async () => {
 
 <style scoped>
 .product-header {
+  position: relative;
   text-align: center;
   margin-bottom: 2rem;
   padding: 1rem;
@@ -157,10 +183,37 @@ onMounted(async () => {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
+.header-content {
+  margin-right: 100px; /* 마킹 버튼을 위한 공간 확보 */
+}
+
 .product-header h1 {
   color: #696957;
   font-size: 2rem;
   margin-bottom: 1rem;
+}
+
+.mark-button {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: #DDBEA9;
+  color: white;
+  font-size: 0.9rem;
+}
+
+.mark-button.marked {
+  background: #CB997E;
+}
+
+.mark-button:hover {
+  transform: translateY(-2px);
+  background: #CB997E;
 }
 
 .product-detail {

@@ -14,6 +14,6 @@ urlpatterns = [
     path('api/v1/exchange/', include('exchange.urls')),
     path('api/runninggame/', include('runninggame.urls')),
     path('accounts/update_dog_type/', views.update_dog_type, name='update_dog_type'),
-    # 금융 상품 관련 URL
+    path('api/v1/accounts/', include('accounts.urls')),
     path('api/v1/', include('products.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

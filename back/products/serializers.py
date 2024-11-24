@@ -18,7 +18,10 @@ class ProductSerializer(serializers.ModelSerializer):
     def get_is_marked(self, obj):
         request = self.context.get('request')
         if request and request.user.is_authenticated:
-            return ProductMark.objects.filter(user=request.user, product=obj).exists()
+            return ProductMark.objects.filter(
+                user=request.user, 
+                product=obj
+            ).exists()
         return False
 
 class ProductCommentSerializer(serializers.ModelSerializer):

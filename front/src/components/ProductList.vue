@@ -1,7 +1,7 @@
 <template>
   <div class="products-container">
     <div class="products-grid">
-      <div v-for="product in products" :key="product.id" class="product-card" @click="goToDetail(product.id)">
+      <div v-for="product in products" :key="product.fin_prdt_cd" class="product-card">
         <div class="card-header">
           <h3>{{ product.fin_prdt_nm }}</h3>
           <span class="product-type-badge">
@@ -22,6 +22,21 @@
             <span class="value">{{ product.join_member }}</span>
           </div>
         </div>
+        <div class="card-footer">
+          <button 
+            class="mark-button" 
+            :class="{ marked: product.is_marked }" 
+            @click.stop="handleMark(product)"
+          >
+            {{ product.is_marked ? '마킹 취소 🐾' : '마킹하기 🐾' }}
+          </button>
+          <button 
+            class="detail-button" 
+            @click.stop="goToDetail(product.fin_prdt_cd)"
+          >
+            자세히 보기
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -29,8 +44,10 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
+import { useFinanceStore } from '@/stores/finance'
 
 const router = useRouter()
+const financeStore = useFinanceStore()
 
 defineProps({
   products: {
@@ -39,10 +56,26 @@ defineProps({
   }
 })
 
-const goToDetail = (productId) => {
-  router.push(`/products/${productId}`)
+const handleMark = async (product) => {
+  const token = localStorage.getItem('token')
+  if (!token) {
+    alert('로그인이 필요한 서비스입니다.')
+    router.push('/login')
+    return
+  }
+
+  try {
+    await financeStore.toggleMark(product.fin_prdt_cd)
+  } catch (error) {
+    console.error('마킹 처리 실패:', error)
+  }
+}
+
+const goToDetail = (productCode) => {
+  router.push(`/products/${productCode}`)
 }
 </script>
+
 
 <style scoped>
 .products-container {
@@ -65,6 +98,9 @@ const goToDetail = (productId) => {
   transition: all 0.3s ease;
   cursor: pointer;
   border: 1px solid #f7f1ee;
+  display: flex;
+  flex-direction: column;
+  height: auto;  /* 높이를 컨텐츠에 맞게 조정 */
 }
 
 .product-card:hover {
@@ -95,6 +131,13 @@ const goToDetail = (productId) => {
   line-height: 1.4;
 }
 
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+  gap: 1rem;
+}
+
 .product-type-badge {
   display: inline-block;
   background: #CB997E;
@@ -109,6 +152,7 @@ const goToDetail = (productId) => {
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
+  flex: 1;
 }
 
 .info-item {
@@ -147,5 +191,35 @@ const goToDetail = (productId) => {
   font-size: 0.9rem;
   text-align: right;
   max-width: 60%;
+}
+
+.mark-button, .detail-button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.mark-button {
+  background: #DDBEA9;
+  color: white;
+}
+
+.mark-button.marked {
+  background: #CB997E;
+}
+
+.detail-button {
+  background: #A5A58D;
+  color: white;
+}
+
+.mark-button:hover {
+  background: #CB997E;
+}
+
+.detail-button:hover {
+  background: #B7B7A4;
 }
 </style>
