@@ -9,14 +9,14 @@ class UserManager(BaseUserManager):
         user = self.model(email=email, username=username, **extra_fields)
         user.set_password(password)
         # 기본 프로필 이미지 설정
-        user.profile_img = 'profiles/default.png'
+        user.profile_img = 'profiles/0.png'
         user.save(using=self._db)
         return user
 
 class User(AbstractBaseUser):
     email = models.EmailField(unique=True)
     username = models.CharField(max_length=20)
-    profile_img = models.ImageField(upload_to='profiles/', default='profiles/default.jpg')
+    profile_img = models.ImageField(upload_to='profiles/', default='profiles/0.png')
     dog_type = models.IntegerField(default=0)
     password1 = models.CharField(max_length=128)
     password2 = models.CharField(max_length=128)  # 비밀번호 확인용
@@ -33,5 +33,5 @@ class User(AbstractBaseUser):
         if 1 <= test_result <= 16:  # 유효한 테스트 결과 범위 확인
             self.dog_type = test_result
             # dog_type이 변경되면 프로필 이미지도 자동으로 업데이트
-            self.profile_img = f'profiles/type_{test_result}.png'
+            self.profile_img = f'profiles/{test_result}.png'
             self.save()

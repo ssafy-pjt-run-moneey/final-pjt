@@ -45,9 +45,9 @@ def article_detail(request, article_pk):
             return Response(serializer.data)
         
 @api_view(['GET'])
-def comment_list(request):
+def comment_list(request, article_pk):
     if request.method == 'GET':
-        comments = Comment.objects.all()
+        comments = Comment.objects.filter(article_id=article_pk)
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data)
     
@@ -69,15 +69,24 @@ def comment_detail(request, comment_pk):
             serializer.save()
             return Response(serializer.data)
 
-@api_view(['POST'])
+@api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def comment_create(request, article_pk):
     article = get_object_or_404(Article, pk=article_pk)
-    serializer = CommentSerializer(data = request.data)
-    if serializer.is_valid(raise_exception=True):
-        serializer.save(article=article, user=request.user)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    
+
+    if request.method == 'GET':
+        # 특정 게시글의 댓글만 필터링
+        comments = Comment.objects.filter(article=article)
+        serializer = CommentSerializer(comments, many=True)
+        return Response(serializer.data)
+
+    elif request.method == 'POST':
+        # 댓글 생성 로직
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save(article=article, user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+          
     
 # @api_view(['POST'])
 # #해당유저가 로그인되있는지 확인하는 데코?s,
