@@ -9,60 +9,69 @@ from .models import Product, Option, ProductMark, ProductComment
 from .serializers import ProductSerializer, ProductCommentSerializer
 
 def fetch_products():
-    url = "http://finlife.fss.or.kr/finlifeapi/depositProductsSearch.json"
-    params = {
-        'auth': settings.FSS_API_KEY,
-        'topFinGrpNo': '020000',
-        'pageNo': '1',
-        'resultType': 'json'
+    base_url = "http://finlife.fss.or.kr/finlifeapi/"
+    product_types = {
+        'deposit': 'depositProductsSearch.json',
+        'savings': 'savingProductsSearch.json'
     }
     
-    try:
-        response = requests.get(url, params=params)
-        data = response.json()
+    for product_type, endpoint in product_types.items():
+        url = base_url + endpoint
+        params = {
+            'auth': settings.FSS_API_KEY,
+            'topFinGrpNo': '020000',
+            'pageNo': '1',
+            'resultType': 'json'
+        }
         
-        if response.status_code != 200:
-            return False
+        try:
+            response = requests.get(url, params=params)
+            data = response.json()
             
-        base_list = data.get('result', {}).get('baseList', [])  # result 키로 접근
-        option_list = data.get('result', {}).get('optionList', [])
-        
-        for product_data in base_list:
-            product, _ = Product.objects.update_or_create(
-                fin_prdt_cd=product_data['fin_prdt_cd'],
-                defaults={
-                    'dcls_month': product_data.get('dcls_month', ''),
-                    'fin_prdt_nm': product_data.get('fin_prdt_nm', ''),
-                    'kor_co_nm': product_data.get('kor_co_nm', ''),
-                    'etc_note': product_data.get('etc_note', ''),
-                    'join_deny': int(product_data.get('join_deny', 0)),
-                    'join_member': product_data.get('join_member', ''),
-                    'join_way': product_data.get('join_way', ''),
-                    'spcl_cnd': product_data.get('spcl_cnd', ''),
-                }
-            )
-        
-        for option_data in option_list:
-            try:
-                product = Product.objects.get(fin_prdt_cd=option_data['fin_prdt_cd'])
-                Option.objects.update_or_create(
-                    product=product,
-                    save_trm=option_data.get('save_trm', 0),
+            if response.status_code != 200:
+                continue
+                
+            base_list = data.get('result', {}).get('baseList', [])
+            option_list = data.get('result', {}).get('optionList', [])
+            
+            for product_data in base_list:
+                product, _ = Product.objects.update_or_create(
+                    fin_prdt_cd=product_data['fin_prdt_cd'],
                     defaults={
-                        'dcls_month': option_data.get('dcls_month', ''),
-                        'intr_rate_type_nm': option_data.get('intr_rate_type_nm', ''),
-                        'intr_rate': float(option_data.get('intr_rate', 0) or 0),  # None 처리
-                        'intr_rate2': float(option_data.get('intr_rate2', 0) or 0),  # None 처리
+                        'product_type': product_type,
+                        'dcls_month': product_data.get('dcls_month', ''),
+                        'fin_prdt_nm': product_data.get('fin_prdt_nm', ''),
+                        'kor_co_nm': product_data.get('kor_co_nm', ''),
+                        'etc_note': product_data.get('etc_note', ''),
+                        'join_deny': int(product_data.get('join_deny', 0)),
+                        'join_member': product_data.get('join_member', ''),
+                        'join_way': product_data.get('join_way', ''),
+                        'spcl_cnd': product_data.get('spcl_cnd', ''),
                     }
                 )
-            except (Product.DoesNotExist, ValueError, TypeError) as e:
-                print(f"Error processing option: {e}")
-                continue
-        
-        return True
-    except Exception as e:
-        print(f"Error fetching products: {e}")
-        return False
+            
+            for option_data in option_list:
+                try:
+                    product = Product.objects.get(fin_prdt_cd=option_data['fin_prdt_cd'])
+                    Option.objects.update_or_create(
+                        product=product,
+                        save_trm=option_data.get('save_trm', 0),
+                        defaults={
+                            'dcls_month': option_data.get('dcls_month', ''),
+                            'intr_rate_type_nm': option_data.get('intr_rate_type_nm', ''),
+                            'intr_rate': float(option_data.get('intr_rate', 0) or 0),
+                            'intr_rate2': float(option_data.get('intr_rate2', 0) or 0),
+                        }
+                    )
+                except (Product.DoesNotExist, ValueError, TypeError) as e:
+                    print(f"Error processing option: {e}")
+                    continue
+                    
+        except Exception as e:
+            print(f"Error fetching {product_type} products: {e}")
+            continue
+    
+    return True
 
 @api_view(['GET'])
 @permission_classes([AllowAny])

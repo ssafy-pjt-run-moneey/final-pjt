@@ -1,12 +1,19 @@
+<!-- components/ProductFilter.vue -->
 <template>
   <div class="filter-section">
+    <select v-model="productType" class="filter-select" @change="emitFilters">
+      <option value="">상품 유형 선택</option>
+      <option value="deposit">예금</option>
+      <option value="savings">적금</option>
+    </select>
+    
     <select v-model="bankSelected" class="filter-select" @change="emitFilters">
       <option value="">은행 선택</option>
       <option v-for="bank in banks" :key="bank" :value="bank">
         {{ bank }}
       </option>
     </select>
-
+    
     <select v-model="termSelected" class="filter-select" @change="emitFilters">
       <option value="">가입기간 선택</option>
       <option value="6">6개월 이하</option>
@@ -26,6 +33,7 @@ defineProps({
   }
 })
 
+const productType = ref('')
 const bankSelected = ref('')
 const termSelected = ref('')
 
@@ -33,6 +41,7 @@ const emit = defineEmits(['filter-change'])
 
 const emitFilters = () => {
   emit('filter-change', {
+    type: productType.value,
     bank: bankSelected.value,
     term: termSelected.value
   })

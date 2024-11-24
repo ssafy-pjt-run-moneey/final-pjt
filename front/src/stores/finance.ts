@@ -1,11 +1,10 @@
-// stores/finance.ts
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import api from '@/api'
 
 export const useFinanceStore = defineStore('finance', () => {
   const products = ref([])
-  const selectedProduct = ref(null)  // selectedProduct 추가
+  const selectedProduct = ref(null)
   const loading = ref(false)
   const error = ref(null)
 
@@ -40,10 +39,10 @@ export const useFinanceStore = defineStore('finance', () => {
 
   return {
     products,
-    selectedProduct,  // return에도 추가
+    selectedProduct,
     loading,
     error,
     fetchProducts,
-    fetchProductDetail  // fetchProductDetail도 return
+    fetchProductDetail
   }
 })

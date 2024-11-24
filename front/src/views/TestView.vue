@@ -1,31 +1,33 @@
 <template>
-  <div class="game-container">
-    <div v-if="!gameStarted" class="start-screen">
-      <h2>달려라 멍니! 성향 테스트</h2>
-      <p>
-      방향키로 강아지🐶를 조작하고,<br>
-      점프(↑)해 현재 답변에 닿으면<br>
-      답변이 바뀝니다!
-      </p>
-      <button @click="startGame">게임 시작</button>
-    </div>
-    <div v-else class="game-area">
-      <img class="dog" :style="dogStyle" src="/dogs/default/running.gif" alt="Running Dog">
-      <div v-if="showQuestion && currentQuestionIndex < questions.length" class="question-modal">
-        <h3 class="question-text" v-html="questions[currentQuestionIndex].text"></h3>
-        <div class="timer">{{ timer }}</div>
-        <div class="answer">현재 답변: {{ currentAnswer }}</div>
+  <div class="container">
+    <div class="game-container">
+      <div v-if="!gameStarted" class="start-screen">
+        <h2>달려라 멍니! 성향 테스트</h2>
+        <p>
+        방향키로 강아지🐶를 조작하고,<br>
+        점프(↑)해 현재 답변에 닿으면<br>
+        답변이 바뀝니다!
+        </p>
+        <button @click="startGame">게임 시작</button>
       </div>
-      <div class="answer-summary">{{ answerSummary }}</div>
-      <div v-if="showResult" class="result-modal">
-        <div class="modal-content">
-          <h2>당신의 투자 성향은...</h2>
-          <div class="dog-result">
-            <img :src="`/dogs/types/type_${resultType}.png`" :alt="dogTypes[resultType]" />
-            <h3>{{ dogTypes[resultType] }}</h3>
-            <p>{{ dogDescriptions[resultType] }}</p>
+      <div v-else class="game-area">
+        <img class="dog" :style="dogStyle" src="/dogs/default/running.gif" alt="Running Dog">
+        <div v-if="showQuestion && currentQuestionIndex < questions.length" class="question-modal">
+          <h3 class="question-text" v-html="questions[currentQuestionIndex].text"></h3>
+          <div class="timer">{{ timer }}</div>
+          <div class="answer">현재 답변: {{ currentAnswer }}</div>
+        </div>
+        <div class="answer-summary">{{ answerSummary }}</div>
+        <div v-if="showResult" class="result-modal">
+          <div class="modal-content">
+            <h2>당신의 투자 성향은...</h2>
+            <div class="dog-result">
+              <img :src="`/dogs/types/type_${resultType}.png`" :alt="dogTypes[resultType]" />
+              <h3>{{ dogTypes[resultType] }}</h3>
+              <p>{{ dogDescriptions[resultType] }}</p>
+            </div>
+            <button @click="restartGame">다시하기</button>
           </div>
-          <button @click="restartGame">다시하기</button>
         </div>
       </div>
     </div>
@@ -251,6 +253,10 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+.container {
+  padding: 20px;
+}
+
 .game-container {
   width: 800px;
   height: 400px;

@@ -2,6 +2,11 @@
 from django.db import models
 
 class Product(models.Model):
+    PRODUCT_TYPES = (
+        ('deposit', '예금'),
+        ('savings', '적금'),
+    )
+    product_type = models.CharField(max_length=10, choices=PRODUCT_TYPES)
     dcls_month = models.CharField(max_length=6)
     fin_prdt_cd = models.TextField(unique=True)
     fin_prdt_nm = models.TextField()
