@@ -84,13 +84,3 @@ export default {
   },
 }
 </script>
-
-<style scoped>
-textarea {
-  width: 100%;
-  max-width: 600px;
-}
-button {
-  margin-top: 10px;
-}
-</style>

@@ -12,13 +12,12 @@ from rest_framework import serializers
 from .models import Comment
 
 class CommentSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(source='user.username', read_only=True)
-
+    username = serializers.ReadOnlyField(source='user.username')  # 작성자 이름 추가
 
     class Meta:
         model = Comment
-        fields = '__all__'
-        read_only_fields = ('article','user')
+        fields = ['id', 'content', 'article', 'username', 'created_at', 'updated_at']
+        read_only_fields = ['article', 'username', 'created_at', 'updated_at']
 
         
                       
