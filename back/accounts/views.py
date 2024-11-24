@@ -5,13 +5,15 @@ from django.contrib.auth.hashers import check_password
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .serializers import UserSerializer
+from .serializers import UserSerializer, UserProfileSerializer
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
 from products.models import Product
 from products.serializers import ProductSerializer
 from django.shortcuts import get_object_or_404
+from articles.serializers import ArticleSerializer
+from articles.models import Article
 
 @api_view(['POST'])
 def register(request):
@@ -107,23 +109,27 @@ def update_dog_type(request):
             'message': 'Dog type is required.'
         }, status=status.HTTP_400_BAD_REQUEST)
     
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
-from products.serializers import ProductSerializer
-from .serializers import UserProfileSerializer
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def user_profile(request, user_id=None):
-    user = request.user if user_id is None else get_object_or_404(User, id=user_id)
-    marked_products = Product.objects.filter(productmark__user=user)
-    
+def user_profile(request):
+    user = request.user
     data = {
-        'user': UserProfileSerializer(user).data,
-        'marked_products': ProductSerializer(marked_products, many=True).data,
-        'is_following': request.user.following.filter(id=user.id).exists() if user_id else None
+        'id': user.id,
+        'email': user.email,
+        'username': user.username,
+        'profile_img': request.build_absolute_uri(user.profile_img.url) if user.profile_img else None,
+        'dog_type': user.dog_type,
+        'created_date': user.created_date,
+        'marked_products': ProductSerializer(
+            Product.objects.filter(productmark__user=user),
+            many=True
+        ).data,
+        'articles': ArticleSerializer(
+            Article.objects.filter(user=user).order_by('-created_at'),
+            many=True
+        ).data,
     }
     return Response(data)
 

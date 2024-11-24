@@ -6,13 +6,36 @@ export const useUserStore = defineStore('user', () => {
   const currentUser = ref(null)
   const userProfile = ref(null)
 
-  const fetchUserProfile = async (userId) => {
+  const fetchUserProfile = async () => {
     try {
-      const response = await api.get(`/accounts/profile/${userId}/`)
-      return response.data
+      const token = localStorage.getItem('token')
+      if (!token) {
+        router.push('/login')
+        return
+      }
+      
+      // URL에서 사용자 ID를 가져옴
+      const userId = route.params.id
+      const url = userId ? `/accounts/profile/${userId}/` : '/accounts/profile/'
+      
+      const response = await api.get(url, {
+        headers: {
+          Authorization: `Token ${token}`
+        }
+      })
+      userProfile.value = response.data
+      
+      // 디버깅용 로그
+      console.log('Current user:', userStore.currentUser)
+      console.log('Profile:', userProfile.value)
+      
+      // 팔로워/팔로잉 상태 업데이트
+      if (userProfile.value) {
+        followers.value = userProfile.value.followers || []
+        followings.value = userProfile.value.following || []
+      }
     } catch (error) {
       console.error('프로필 조회 실패:', error)
-      throw error
     }
   }
 
