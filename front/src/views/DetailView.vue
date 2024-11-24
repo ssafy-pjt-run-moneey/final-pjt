@@ -1,134 +1,117 @@
 <template>
-  <div>
-    <h1 class="detail-wrapper">자유게시판</h1>
+  <div class="detail-container">
+    <!-- 게시글 데이터가 로드되었을 때만 렌더링 -->
+    <div v-if="article" class="article-card">
+      <!-- 제목 -->
+      <h2 class="article-title">{{ article.title }}</h2>
 
-    <!-- 상세 페이지 내용 -->
-    <template v-if="article">
-      <div class="article-wrapper">
-        <!-- 제목 -->
-        <h2>{{ article.title }}</h2>
-
-        <!-- 작성자 프로필 -->
-        <div class="author-info">
-          <img
-            :src="getProfileImage(article.profile_img)"
-            alt="프로필 이미지"
-            class="profile-img"
-          />
+      <!-- 작성자 정보 -->
+      <div class="author-info">
+        <img
+          :src="getProfileImage(article.profile_img)"
+          alt="프로필 이미지"
+          class="profile-img"
+        />
+        <div>
           <p class="author-name">{{ article.username }}</p>
+          <p class="created-at">작성일: {{ formatDate(article.created_at) }}</p>
         </div>
-
-        <!-- 내용 -->
-        <div class="content-container">
-          <p>{{ article.content }}</p>
-        </div>
-
-        <!-- 작성시간 -->
-        <p>작성시간: {{ formatDate(article.created_at) }}</p>
-
         <!-- 수정 및 삭제 버튼 -->
-        <div
-          v-if="
-            article &&
-            article.username &&
-            userInfo &&
-            article.username === userInfo.username
-          "
-          class="button-wrapper"
-        >
+        <div v-if="isAuthor" class="action-buttons">
           <button
-            type="button"
+            @click="goToUpdatePage"
+            class="btn-update"
+          >
+            수정하기
+          </button>
+          <button
             @click="deleteArticle"
-            class="btn btn-outline-danger mx-1"
+            class="btn-delete"
           >
             삭제하기
           </button>
-          <router-link :to="{ name: 'UpdateView', params: { id: article.id } }">
-            <button type="button" class="btn btn-outline-primary mx-1">
-              수정하기
-            </button>
-          </router-link>
         </div>
-
-        <!-- 댓글 컴포넌트 -->
-        <Comments v-if="article.id" :article="article" />
       </div>
-    </template>
+
+      <hr>
+      <!-- 내용 -->
+      <div class="article-content">
+        <p>{{ article.content }}</p>
+      </div>
+
+      <!-- 업로드된 이미지 -->
+      <div v-if="article.image" class="article-image">
+        <img :src="getImageUrl(article.image)" alt="업로드된 이미지" />
+      </div>
+
+      <hr>
+      <!-- 댓글 컴포넌트 -->
+      <Comments v-if="article.id" :article="article" />
+    </div>
+
+    <!-- 로딩 중 메시지 -->
+    <div v-else class="loading-message">
+      <p>게시글을 불러오는 중입니다...</p>
+    </div>
   </div>
 </template>
 
 <script>
-import { useCounterStore } from "@/stores/counter";
 import axios from "axios";
-import Comments from "../components/Comments.vue";
+import Comments from "@/components/Comments.vue";
 
 const API_URL = "http://127.0.0.1:8000";
 
 export default {
-  name: "ArticleDetailView",
+  name: "DetailView",
   components: {
     Comments,
   },
-  setup() {
-    const store = useCounterStore();
-    return { store };
-  },
   data() {
     return {
-      article: null, // 현재 선택된 게시글
+      article: null, // 게시글 데이터
+      userInfo: null, // 현재 로그인한 사용자 정보
     };
   },
   computed: {
-    userInfo() {
-      return this.store.userInfo;
+    isAuthor() {
+      // 현재 로그인한 사용자가 게시글 작성자인지 확인
+      return this.article && this.userInfo && this.article.username === this.userInfo.username;
     },
   },
   created() {
     this.getArticleDetail();
+    this.getUserInfo();
   },
   methods: {
     async getArticleDetail() {
-      const token = this.store.token;
-      if (!token) {
-        console.log("토큰이 없습니다. 로그인이 필요합니다.");
-        this.$router.push("/login");
-        return;
-      }
-
       try {
-        const response = await axios.get(
-          `${API_URL}/articles/${this.$route.params.id}/`,
-          { headers: { Authorization: `Token ${token}` } }
-        );
+        const response = await axios.get(`${API_URL}/articles/${this.$route.params.id}/`, {
+          headers: { Authorization: `Token ${localStorage.getItem("token")}` },
+        });
         this.article = response.data;
       } catch (error) {
         console.error("게시글 상세 정보 불러오기 실패:", error);
       }
     },
-    deleteArticle() {
-      const token = this.store.token;
-      axios({
-        method: "delete",
-        url: `${API_URL}/articles/${this.$route.params.id}/`,
-        headers: { Authorization: `Token ${token}` },
-      })
-        .then(() => {
-          this.$router.push({ name: "ArticlesView" });
-        })
-        .catch((err) => {
-          console.error(err);
-          if (err.response && err.response.status === 401) {
-            this.store.logOut();
-            this.$router.push("/login");
-          }
+    async getUserInfo() {
+      try {
+        const response = await axios.get(`${API_URL}/articles/users/me/`, {
+          headers: { Authorization: `Token ${localStorage.getItem("token")}` },
         });
+        this.userInfo = response.data;
+      } catch (error) {
+        console.error("사용자 정보 불러오기 실패:", error.response.data);
+      }
     },
     getProfileImage(profileImgPath) {
-      // 기본값 처리 및 전체 URL 반환
-      if (!profileImgPath) {
-        return "/media/profiles/default.jpg"; // 기본 이미지 경로 설정
+      if (!profileImgPath || profileImgPath === "null") {
+        return "/media/profiles/default.jpg"; // 기본 프로필 이미지 경로
       }
-      return `http://127.0.0.1:8000${profileImgPath}`; // 전체 URL 반환
+      return `http://127.0.0.1:8000${profileImgPath}`;
+    },
+    getImageUrl(imagePath) {
+      return `http://127.0.0.1:8000${imagePath}`;
     },
     formatDate(datetime) {
       const dateObj = new Date(datetime);
@@ -140,24 +123,52 @@ export default {
 
       return `${year}년-${month}월-${day}일 ${hours}:${minutes}`;
     },
+    goToUpdatePage() {
+      // 수정 페이지로 이동
+      this.$router.push({ name: "UpdateView", params: { id: this.$route.params.id } });
+    },
+    async deleteArticle() {
+      if (!confirm("정말로 이 게시글을 삭제하시겠습니까?")) return;
+
+      try {
+        await axios.delete(`${API_URL}/articles/${this.$route.params.id}/`, {
+          headers: { Authorization: `Token ${localStorage.getItem("token")}` },
+        });
+        alert("게시글이 삭제되었습니다.");
+        this.$router.push({ name: "ArticlesView" }); // 게시글 목록으로 이동
+      } catch (error) {
+        console.error("게시글 삭제 실패:", error.response.data);
+        alert("게시글 삭제 중 오류가 발생했습니다.");
+      }
+    },
   },
 };
 </script>
 
 <style scoped>
-.detail-wrapper {
-  text-align: center;
+.detail-container {
+  max-width: 800px;
+  margin: 20px auto;
 }
 
-.article-wrapper {
-  width: 50%;
-  margin: 0 auto;
+.article-card {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+
+.article-title {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
 }
 
 .author-info {
   display: flex;
-  align-items: center;
-  margin-top: 10px;
+  align-items: center; /* 세로 가운데 정렬 */
+  gap: 15px; /* 프로필 사진과 작성자 정보 간 간격 추가 */
+  margin-top: 15px;
 }
 
 .profile-img {
@@ -167,14 +178,60 @@ export default {
 }
 
 .author-name {
-  margin-left: 10px;
-  font-size: 18px;
+  font-size: 16px;
 }
 
-.content-container {
-  border: 1px solid #ccc;
-  padding: 20px;
-  border-radius: 5px;
-  background-color: #f9f9f9;
+.created-at {
+  font-size: 14px;
 }
+
+.article-image img {
+  width: 100%;
+}
+
+hr {
+  margin: 20px;
+}
+
+.article-content p {
+  padding: 10px;
+  margin-left: 20px;
+}
+
+.btn-update {
+  padding: 8px 12px;
+  background-color: #B7B7A4; /* 요청한 색상 */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: auto; /* 버튼을 오른쪽으로 정렬 */
+}
+
+.btn-update:hover {
+  background-color: #9C9C8B; /* hover 효과 */
+}
+
+.btn-delete {
+  padding: 8px 12px;
+  background-color: #DDBEA9; /* 요청한 색상 */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: auto; /* 버튼을 오른쪽으로 정렬 */
+}
+
+.btn-delete:hover {
+  background-color: #CB997E; /* hover 효과 */
+}
+
+/* 버튼 간 간격 추가 */
+.action-buttons {
+  display: flex;
+  gap: 8px; /* 버튼 간격을 살짝 추가 */
+  margin-left: auto;
+}
+
+
 </style>

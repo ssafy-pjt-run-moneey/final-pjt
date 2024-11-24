@@ -8,6 +8,7 @@ import ProductsView from '@/views/ProductsView.vue'
 import ArticlesView from '@/views/ArticlesView.vue'
 import DetailView from '@/views/DetailView.vue'
 import CreateView from '@/views/CreateView.vue'
+import UpdateView from '@/views/UpdateView.vue'
 import MapView from '@/views/MapView.vue'
 import ExchangeView from '@/views/ExchangeView.vue'
 import { useCounterStore } from '@/stores/counter'
@@ -65,6 +66,11 @@ const router = createRouter({
       path: '/create',
       name: 'CreateView',
       component: CreateView
+    },
+    {
+      path: '/articles/:id/update',
+      name: 'UpdateView',
+      component: UpdateView
     },
     {
       path: '/map',

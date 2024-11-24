@@ -1,53 +1,47 @@
 <template>
-  <div>
-    <h1 class="article-list">자유게시판</h1>
-    <br />
-
-    <div class="table-container">
-      <table class="table table-hover">
+  <div class="articles-container">
+    <div class="articles-table">
+      <table>
         <thead>
           <tr>
-            <th scope="col">제목</th>
-            <th scope="col">프로필</th>
-            <th scope="col">작성자</th>
-            <th scope="col">작성일</th>
+            <th>ID</th>
+            <th>제목</th>
+            <th>작성자</th>
+            <th>작성일</th>
           </tr>
         </thead>
         <tbody>
-          <!-- 게시글 목록 표시 -->
           <tr
-            class="clickable"
             v-for="article in articles"
             :key="article.id"
             @click="goToDetail(article.id)"
+            class="article-row"
           >
-            <!-- 게시글 제목 -->
-            <th scope="row">{{ article.title }}</th>
-            <!-- 프로필 이미지 -->
-            <td>
-              <img
-                :src="getProfileImage(article.profile_img)"
-                alt="프로필 이미지"
-                class="profile-img"
-              />
+            <!-- 게시글 ID -->
+            <td class="id-cell">{{ article.id }}</td>
+
+            <!-- 제목 -->
+            <td class="title-cell">{{ article.title }}</td>
+
+            <!-- 작성자 -->
+            <td class="author-cell">
+              <div class="author-wrapper">
+                <img
+                  :src="getProfileImage(article.profile_img)"
+                  alt="프로필 이미지"
+                  class="profile-img"
+                />
+                <span>{{ article.username }}</span>
+              </div>
             </td>
-            <!-- 작성자 이름 -->
-            <td>{{ article.username }}</td>
+
             <!-- 작성일 -->
-            <td>{{ article.created_at.substring(0, 10) }}</td>
+            <td class="date-cell">{{ article.created_at.substring(0, 10) }}</td>
           </tr>
         </tbody>
       </table>
     </div>
-
-    <!-- 글쓰기 버튼 -->
-    <button
-      type="button"
-      @click="createArticle"
-      class="btn btn-outline-success my-3"
-    >
-      글쓰기
-    </button>
+    <button @click="createArticle" class="btn-create">글쓰기</button>
   </div>
 </template>
 
@@ -65,16 +59,11 @@ export default {
   },
   data() {
     return {
-      articles: [], // 게시글 목록
+      articles: [],
     };
   },
-  computed: {
-    isLogin() {
-      return this.store.isLogin;
-    },
-  },
   created() {
-    this.getArticles(); // 컴포넌트가 생성될 때 게시글 목록 가져오기
+    this.getArticles();
   },
   methods: {
     async getArticles() {
@@ -82,57 +71,97 @@ export default {
         const response = await axios.get(`${API_URL}/articles/`, {
           headers: { Authorization: `Token ${this.store.token}` },
         });
-        this.articles = response.data; // 게시글 목록 업데이트
+        this.articles = response.data;
       } catch (error) {
         console.error("게시글 목록을 가져오는데 실패했습니다:", error);
-        if (error.response && error.response.status === 401) {
-          alert("인증에 실패했습니다. 다시 로그인해주세요.");
-          this.store.logOut();
-          this.$router.push("/login");
-        }
       }
     },
     goToDetail(articleId) {
-      // 상세 페이지로 이동
       this.$router.push({ name: "DetailView", params: { id: articleId } });
     },
     createArticle() {
-      // 글쓰기 페이지로 이동
-      if (this.isLogin) {
+      if (this.store.isLogin) {
         this.$router.push({ name: "CreateView" });
       } else {
-        alert("로그인을 해주세요.");
+        alert("로그인이 필요합니다.");
       }
     },
     getProfileImage(profileImgPath) {
-      // 기본값 처리 및 전체 URL 반환
-      if (!profileImgPath) {
-        return "/media/profiles/default.jpg"; // 기본 이미지 경로 설정
+      if (!profileImgPath || profileImgPath === "null") {
+        return "/media/profiles/default.jpg"; // 기본 프로필 이미지 경로
       }
-      return `http://127.0.0.1:8000${profileImgPath}`; // 전체 URL 반환
+      return `http://127.0.0.1:8000${profileImgPath}`;
     },
   },
 };
 </script>
 
 <style scoped>
-.article-list {
+.articles-container {
+  max-width: 800px;
+  margin: 20px auto;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: bold;
   text-align: center;
+  margin-bottom: 20px;
 }
 
-.table-container {
-  width: 80%;
-  margin: 0 auto;
+.articles-table table {
+  width: 100%;
+  border-collapse: collapse;
 }
 
-.article-list table td,
-.article-list table th {
-  vertical-align: middle;
+.articles-table th,
+.articles-table td {
+  border-bottom: 1px solid #ddd;
+  padding: 10px;
+  text-align: center; /* 모든 내용 가운데 정렬 */
+}
+
+/* 게시글 ID */
+.id-cell {
+  width: 10%; /* ID 칸 너비 */
+}
+
+/* 제목 칸 */
+.title-cell {
+  width: 40%; /* 제목 칸 너비 */
+}
+
+/* 작성자 칸 */
+.author-cell {
+  width: 25%; /* 작성자 칸 너비 */
+}
+
+.author-wrapper {
+  display: flex; /* 프로필 사진과 이름을 가로로 배치 */
+  align-items: center; /* 세로 가운데 정렬 */
+  justify-content: center; /* 가로 가운데 정렬 */
 }
 
 .profile-img {
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
+  margin-right: 10px; /* 이름과 이미지 간격 */
+}
+
+/* 작성일 칸 */
+.date-cell {
+  width: 25%; /* 작성일 칸 너비 */
+}
+
+/* 행 hover 효과 */
+.article-row:hover {
+  background-color: #f9f9f9;
+}
+
+/* 글쓰기 버튼 */
+.btn-create {
+  display: block;
+  margin: 20px auto;
 }
 </style>

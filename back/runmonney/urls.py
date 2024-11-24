@@ -16,7 +16,4 @@ urlpatterns = [
     path('accounts/update_dog_type/', views.update_dog_type, name='update_dog_type'),
     # 금융 상품 관련 URL
     path('api/v1/', include('products.urls')),
-]
-
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
