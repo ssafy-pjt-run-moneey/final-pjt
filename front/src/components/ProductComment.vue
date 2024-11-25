@@ -116,10 +116,11 @@ const getProfileImage = (profileImgPath) => {
   if (!profileImgPath || profileImgPath === "null") {
     return 'http://localhost:8000/media/profiles/0.png'
   }
-  // if (profileImgPath.startsWith('http')) {
-  //   return profileImgPath
-  // }
-  return `http://localhost:8000/media/${profileImgPath}`
+  // 전체 URL이 아닌 경우에만 기본 URL 추가
+  if (!profileImgPath.startsWith('http')) {
+    return `http://localhost:8000${profileImgPath}`
+  }
+  return profileImgPath
 }
 
 const fetchComments = async () => {
@@ -130,7 +131,14 @@ const fetchComments = async () => {
     const response = await api.get(`/products/${props.productId}/comments/`, {
       headers: { Authorization: `Token ${token}` }
     })
-    comments.value = response.data
+    comments.value = response.data.map(comment => ({
+      ...comment,
+      isEditing: false,
+      editContent: comment.content,
+      username: comment.user?.username || '',
+      profile_img: comment.user?.profile_img || null
+    }))
+    console.log('댓글 데이터:', comments.value)
   } catch (error) {
     console.error('댓글 조회 실패:', error)
   }

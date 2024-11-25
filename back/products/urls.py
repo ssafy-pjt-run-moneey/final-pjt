@@ -11,4 +11,5 @@ urlpatterns = [
     path('products/<str:fin_prdt_cd>/', views.product_detail, name='product-detail'),
     path('products/<str:pk>/comments/', views.product_comments, name='product-comments'),
     path('products/<str:product_pk>/comments/<int:comment_pk>/', views.comment_detail, name='comment-detail'),
+    path('recommendations/', views.recommendations, name='recommendations'),
 ]

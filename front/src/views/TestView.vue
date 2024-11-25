@@ -4,9 +4,9 @@
       <div v-if="!gameStarted" class="start-screen">
         <h2>달려라 멍니! 성향 테스트</h2>
         <p>
-        방향키로 강아지🐶를 조작하고,<br>
-        점프(↑)해 현재 답변에 닿으면<br>
-        답변이 바뀝니다!
+          방향키로 강아지🐶를 조작하고,<br>
+          점프(↑)해 현재 답변에 닿으면<br>
+          답변이 바뀝니다!
         </p>
         <button @click="startGame">게임 시작</button>
       </div>
@@ -18,17 +18,21 @@
           <div class="answer">현재 답변: {{ currentAnswer }}</div>
         </div>
         <div class="answer-summary">{{ answerSummary }}</div>
-        <div v-if="showResult" class="result-modal">
-          <div class="modal-content">
-            <h2>당신의 투자 성향은...</h2>
-            <div class="dog-result">
-              <img :src="`/dogs/types/type_${resultType}.png`" :alt="dogTypes[resultType]" />
-              <h3>{{ dogTypes[resultType] }}</h3>
-              <p>{{ dogDescriptions[resultType] }}</p>
-            </div>
-            <button @click="restartGame">다시하기</button>
-          </div>
+      </div>
+    </div>
+
+    <!-- 결과 모달을 game-container 밖으로 이동 -->
+    <div v-if="showResult" class="result-modal">
+      <div class="modal-content">
+        <h2>당신의 투자 성향은...</h2>
+        <div class="dog-result">
+          <img :src="`/dogs/types/type_${resultType}.png`" :alt="dogTypes[resultType]" />
+          <h3>{{ dogTypes[resultType] }}</h3>
+          <p>{{ dogDescriptions[resultType] }}</p>
+          <!-- RecommendationModal 컴포넌트 추가 -->
+          <RecommendationModal v-if="showResult" @close="showResult = false" />
         </div>
+        <button @click="restartGame">다시하기</button>
       </div>
     </div>
   </div>
@@ -37,7 +41,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import { useCounterStore } from '@/stores/counter'
-
+import RecommendationModal from '@/components/RecommendationModal.vue'
 const store = useCounterStore()
 
 const gameStarted = ref(false)
@@ -118,7 +122,7 @@ const showNextQuestion = () => {
     answers.value[currentQuestionIndex.value] = 'X'
     startTimer()
   } else {
-    calculateResult()
+    calculateResult(showResult.value = true)
   }
 }
 
@@ -318,42 +322,43 @@ onUnmounted(() => {
   font-weight: bold;
 }
 
-.result-modal {
-  width: 80%;
-  max-width: 500px;
-  background: rgba(255, 255, 255, 0.95);
-  z-index: 1000;
+.result-modal .modal-content {
+   background-color: white;
+   padding: 20px;
+   border-radius: 10px;
+   max-width: calc(100% -40px); /* 화면 크기에 맞게 조정 */
+   max-height: calc(100% -40px); /* 화면 크기에 맞게 조정 */
+   overflow-y:auto; /* 내용이 넘칠 경우 스크롤 가능하게 설정 */
 }
 
 .dog-result img {
-  width: 200px;
-  height: 200px;
-  object-fit: contain;
+   width:200px; 
+   height:auto; 
+   object-fit:contain; 
 }
 
 button {
-  padding: 10px 20px;
-  background: #DDBEA9;
-  border: none;
-  border-radius: 5px;
-  color: white;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background 0.3s;
+   padding:10px20px; 
+   background:#DDBEA9; 
+   border:none; 
+   border-radius:
+5px; 
+color:white; 
+cursor:pointer; 
+font-size:
+16px; 
+transition:
+background0.3s; 
 }
 
-button:hover {
-  background: #C07A57;
-}
+button:hover{
+background:#C07A57;}
 
-.timer {
-  font-size: 24px;
-  font-weight: bold;
-  margin-top: 10px;
-}
+.timer{font-size:
+24px;font-weight:bold;margin-top:
+10px;}
 
-.answer {
-  font-size: 18px;
-  margin-top: 10px;
-}
+.answer{font-size:
+18px;margin-top:
+10px;}
 </style>

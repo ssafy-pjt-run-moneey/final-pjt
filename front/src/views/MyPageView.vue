@@ -4,12 +4,9 @@
     <div class="profile-section">
       <div class="profile-header">
         <div class="profile-image-container">
-          <img 
-            :src="userProfile.profile_img || '/profiles/0.png'"
-            @click="showModal = true"
-            class="profile-image"
-            alt="프로필 이미지"
-          />
+          <!-- MyPageView.vue -->
+          <img :src="userProfile.profile_img || '/profiles/0.png'" @click="showRecommendationModal = true" class="profile-image" alt="프로필 이미지" />
+          <RecommendationModal v-if="showRecommendationModal" @close="showRecommendationModal = false" />
         </div>
         <div class="profile-info">
           <h2>{{ userProfile.username }}</h2>

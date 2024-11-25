@@ -8,6 +8,9 @@ from django.conf import settings
 from .models import Product, Option, ProductMark, ProductComment
 from .serializers import ProductSerializer, ProductCommentSerializer
 from django.core.mail import send_mass_mail
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 def fetch_products():
     base_url = "http://finlife.fss.or.kr/finlifeapi/"
@@ -215,3 +218,32 @@ def subscribe_product(request, fin_prdt_cd):
         return Response({'status': 'subscribed'})
     except Product.DoesNotExist:
         return Response({'error': '상품을 찾을 수 없습니다.'}, status=404)
+    
+
+# products/views.py
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def recommendations(request):
+    user_type = request.user.dog_type
+    
+    # 개인화된 추천 상품
+    personalized_products = Product.objects.filter(
+        options__intr_rate__gt=0,
+        product_type='deposit' if user_type % 2 == 0 else 'savings'
+    ).distinct()[:4]  # distinct() 추가하여 중복 제거
+
+    # 비슷한 성향의 사람들이 많이 마킹한 상품
+    similar_users = User.objects.filter(dog_type=user_type)
+    popular_products_ids = ProductMark.objects.filter(user__in=similar_users).values('product').annotate(
+        mark_count=Count('product')
+    ).order_by('-mark_count').values_list('product', flat=True)[:4]
+    popular_products = Product.objects.filter(fin_prdt_cd__in=popular_products_ids)
+
+    serializer_personalized = ProductSerializer(personalized_products, many=True)
+    serializer_popular = ProductSerializer(popular_products, many=True)
+
+    return Response({
+        'personalized': serializer_personalized.data,
+        'popular': serializer_popular.data
+    })

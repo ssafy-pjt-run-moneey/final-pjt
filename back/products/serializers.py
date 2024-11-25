@@ -1,6 +1,11 @@
-# products/serializers.py
 from rest_framework import serializers
 from .models import Product, Option, ProductMark, ProductComment
+from django.contrib.auth import get_user_model
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = get_user_model()
+        fields = ['id', 'username', 'profile_img']
 
 class OptionSerializer(serializers.ModelSerializer):
     class Meta:
@@ -26,6 +31,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
 class ProductCommentSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username', read_only=True)
+    user = UserProfileSerializer(read_only=True)
     
     class Meta:
         model = ProductComment
