@@ -264,84 +264,84 @@ const getDogType = (type) => {
   // 강아지 유형에 따른 설명 반환
   const types = {
     1: { 
-      name: '바셋하운드',
-      personality: '끈기있고 침착한 성격',
-      finance: '보수적이면서 안정적인 장기형'
-    },
-    2: {
-      name: '치와와',
-      personality: '작지만 대담한 성격',
-      finance: '안전 선호하나 단기 수익 추구형'
-    },
-    3: {
-      name: '사모예드',
-      personality: '충실하고 온화한 성격',
-      finance: '안정적이고 계획적인 장기 저축형'
-    },
-    4: {
-      name: '코커스파니엘',
-      personality: '사교적이고 활발한 성격',
-      finance: '안전 추구하나 유연한 운용형'
-    },
-    5: {
-      name: '웰시코기',
-      personality: '영리하고 활동적인 성격',
-      finance: '적극적 투자, 기회 포착형'
-    },
-    6: {
-      name: '푸들',
-      personality: '영리하고 학습능력 뛰어난 성격',
-      finance: '안정적이면서 체계적인 관리형'
-    },
-    7: {
       name: '비숑',
       personality: '친근하고 상냥한 성격',
-      finance: '보수적이고 안정적인 운용형'
+      finance: '안정적이고 계획적인 저축형'
     },
-    8: {
-      name: '포메라니안',
-      personality: '활발하고 영리한 성격',
-      finance: '공격적 투자, 즉각적 실행형'
+    2: {
+      name: '푸들',
+      personality: '영리하고 학습능력 뛰어난 성격',
+      finance: '안정적이고 자유로운 운용형'
     },
-    9: {
-      name: '닥스훈트',
-      personality: '고집스럽고 독립적인 성격',
-      finance: '장기적 안목의 공격투자형'
+    3: {
+      name: '치와와',
+      personality: '작지만 대담한 성격',
+      finance: '안정 추구, 즉흥적 운용형'
     },
-    10: {
-      name: '보더콜리',
-      personality: '지적이고 훈련성 좋은 성격',
-      finance: '안정적이면서 계획적인 관리형'
-    },
-    11: {
-      name: '파피용',
-      personality: '우아하고 민첩한 성격',
-      finance: '단기 고수익 추구형'
-    },
-    12: {
+    4: {
       name: '슈나우저',
       personality: '충직하고 영리한 성격',
-      finance: '안정적이면서 전략적인 운용형'
+      finance: '안정적이고 적응형'
     },
-    13: {
-      name: '시츄',
-      personality: '온순하고 충실한 성격',
-      finance: '보수적이고 안정적인 장기형'
+    5: {
+      name: '사모예드',
+      personality: '충실하고 온화한 성격',
+      finance: '장기적이며 자유로운 모험형'
     },
-    14: {
+    6: {
+      name: '바셋하운드',
+      personality: '끈기있고 침착한 성격',
+      finance: '장기적이고 자유로운 운용형'
+    },
+    7: {
+      name: '코커스파니엘',
+      personality: '사교적이고 활발한 성격',
+      finance: '장기적이며 상황 대응형'
+    },
+    8: {
+      name: '보더콜리',
+      personality: '지적이고 훈련성 좋은 성격',
+      finance: '장기적이고 유연한 목표형'
+    },
+    9: {
+      name: '포메라니안',
+      personality: '활발하고 영리한 성격',
+      finance: '모험적이고 계획적인 저축형'
+    },
+    10: {
+      name: '파피용',
+      personality: '우아하고 민첩한 성격',
+      finance: '모험적이고 자유로운 운용형'
+    },
+    11: {
+      name: '웰시코기',
+      personality: '영리하고 활동적인 성격',
+      finance: '모험적이고 즉흥적 운용형'
+    },
+    12: {
       name: '불독',
       personality: '침착하고 끈기있는 성격',
-      finance: '안정적이면서 계획적인 관리형'
+      finance: '모험적이며 상황 대응형'
     },
-    15: {
+    13: {
       name: '비글',
       personality: '모험심 강하고 활발한 성격',
-      finance: '단기 고수익 선호, 적극적인 재테크형'
+      finance: '고수익 장기 목표형'
+    },
+    14: {
+      name: '시츄',
+      personality: '온순하고 충실한 성격',
+      finance: '장기적이며 장로운 모험형'
+    },
+    15: {
+      name: '닥스훈트',
+      personality: '고집스럽고 독립적인 성격',
+      finance: '목표 지향적 장기 투자형'
     },
     16: {
       name: '저먼셰퍼드',
       personality: '리더십있고 충직한 성격',
-      finance: '공격적이면서 체계적인 관리형'
+      finance: '목표 지향적이고 장기적인 계획형'
     },
   }
   return types[type] || '알 수 없음'
