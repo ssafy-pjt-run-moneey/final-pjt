@@ -23,7 +23,6 @@
           :src="getProfileImage(comment.user.profile_img)" 
           alt="프로필" 
           class="profile-img"
-          @error="handleImageError"
         />
         <!-- <span class="author-name">{{ comment.username }}</span> -->
         
@@ -109,17 +108,17 @@ const checkAuth = () => {
   return token
 }
 
-const handleImageError = (e) => {
-  e.target.src = 'http://localhost:8000/media/profiles/0.png'
-}
+// const handleImageError = (e) => {
+//   e.target.src = 'http://localhost:8000/media/profiles/0.png'
+// }
 
 const getProfileImage = (profileImgPath) => {
   if (!profileImgPath || profileImgPath === "null") {
     return 'http://localhost:8000/media/profiles/0.png'
   }
-  if (profileImgPath.startsWith('http')) {
-    return profileImgPath
-  }
+  // if (profileImgPath.startsWith('http')) {
+  //   return profileImgPath
+  // }
   return `http://localhost:8000/media/${profileImgPath}`
 }
 
