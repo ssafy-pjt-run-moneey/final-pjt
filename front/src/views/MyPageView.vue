@@ -455,9 +455,25 @@ const fetchUserProfile = async () => {
 }
 
 onMounted(async () => {
-  await fetchUserProfile()
-  if (userProfile.value) {
-    markedProducts.value = await financeStore.fetchMarkedProducts()
+  try {
+    // 먼저 현재 사용자 정보를 가져옴
+    await userStore.fetchUserProfile()
+    console.log('현재 사용자:', userStore.currentUser)
+    
+    // 그 다음 프로필 정보를 가져옴
+    await fetchUserProfile()
+    console.log('프로필 로드됨:', userProfile.value)
+
+    // 프로필 정보가 있으면 마킹된 상품 정보도 가져옴
+    if (userProfile.value) {
+      markedProducts.value = await financeStore.fetchMarkedProducts()
+    }
+  } catch (error) {
+    console.error('프로필 로드 실패:', error)
+    // 에러 발생 시 로그인 페이지로 리다이렉트
+    if (!localStorage.getItem('token')) {
+      router.push('/login')
+    }
   }
 })
 </script>

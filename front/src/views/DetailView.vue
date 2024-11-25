@@ -53,6 +53,9 @@
     <div v-else class="loading-message">
       <p>게시글을 불러오는 중입니다...</p>
     </div>
+    <RouterLink :to="{ name: 'ArticlesView' }" class="auth-link">
+      <img src="/back.png" alt="뒤로가기" class="back">
+    </RouterLink>
   </div>
 </template>
 
@@ -134,7 +137,6 @@ export default {
         await axios.delete(`${API_URL}/articles/${this.$route.params.id}/`, {
           headers: { Authorization: `Token ${localStorage.getItem("token")}` },
         });
-        alert("게시글이 삭제되었습니다.");
         this.$router.push({ name: "ArticlesView" }); // 게시글 목록으로 이동
       } catch (error) {
         console.error("게시글 삭제 실패:", error.response.data);
@@ -172,8 +174,8 @@ export default {
 }
 
 .profile-img {
-  width: 50px;
-  height: 50px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
 }
 
@@ -231,6 +233,11 @@ export default {
   display: flex;
   gap: 8px; /* 버튼 간격을 살짝 추가 */
   margin-left: auto;
+}
+
+.back {
+  width: 30px;
+  padding: 10px;
 }
 
 

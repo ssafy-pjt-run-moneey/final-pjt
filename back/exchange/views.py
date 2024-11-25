@@ -12,8 +12,9 @@ def get_latest_exchange_data(api_key, base_url):
             "searchdate": date,
             "data": "AP01"
         }
-        
-        response = requests.get(base_url, params=params)
+
+        headers = {"User-Agent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"}
+        response = requests.get(base_url, headers=headers, params=params, verify=False)
         
         if response.status_code == 200:
             data = response.json()

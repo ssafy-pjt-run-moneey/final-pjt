@@ -117,7 +117,7 @@ export default {
 .articles-table th,
 .articles-table td {
   border-bottom: 1px solid #ddd;
-  padding: 10px;
+  padding: 3px;
   text-align: center; /* 모든 내용 가운데 정렬 */
 }
 
@@ -143,8 +143,8 @@ export default {
 }
 
 .profile-img {
-  width: 30px;
-  height: 30px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   margin-right: 10px; /* 이름과 이미지 간격 */
 }
@@ -161,7 +161,17 @@ export default {
 
 /* 글쓰기 버튼 */
 .btn-create {
+  padding: 8px 16px;
+  background-color: #B7B7A4; /* 요청한 색상 */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 50%;
+  margin: 30px auto;
   display: block;
-  margin: 20px auto;
+}
+.btn-create:hover {
+  background-color: #9C9C8B; /* hover 효과 */
 }
 </style>

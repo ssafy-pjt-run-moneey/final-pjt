@@ -126,6 +126,7 @@ const updateProfile = async () => {
     })
     
     alert('프로필이 수정되었습니다.')
+    router.push('/mypage')
   } catch (error) {
     console.error('프로필 수정 실패:', error)
     alert('프로필 수정에 실패했습니다.')
@@ -149,20 +150,14 @@ const updatePassword = async () => {
       headers: { Authorization: `Token ${token}` }
     })
     
-    alert('비밀번호가 변경되었습니다. 새 비밀번호로 다시 로그인해주세요.')
-    
-    // 로그아웃 처리
-    localStorage.removeItem('token')
-    userStore.currentUser = null
-    
+    alert('비밀번호가 변경되었습니다.')
     // 입력 필드 초기화
     currentPassword.value = ''
     newPassword.value = ''
     confirmPassword.value = ''
     
-    // 로그인 페이지로 이동
-    router.push('/login')
-    
+    // 마이페이지로 이동
+    router.push('/mypage')
   } catch (error) {
     console.error('비밀번호 변경 실패:', error)
     if (error.response?.data) {

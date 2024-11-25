@@ -152,6 +152,7 @@ const navLinks = [
   margin: 0;
   padding: 0;
   gap: 50px;
+  white-space: nowrap;
 }
 
 .nav-item {
@@ -230,7 +231,7 @@ const navLinks = [
 }
 
 
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
   .header-content {
     flex-direction: column;
     gap: 10px;
@@ -252,5 +253,5 @@ const navLinks = [
   .nav-links li {
     margin: 10px 0;
   }
-}
+} */
 </style>

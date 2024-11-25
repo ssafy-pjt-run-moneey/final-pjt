@@ -135,7 +135,6 @@ export default {
           { content: this.editingContent },
           { headers: { Authorization: `Token ${localStorage.getItem("token")}` } }
         );
-        alert("댓글이 수정되었습니다.");
         this.editingComment = null; // 수정 상태 초기화
         this.editingContent = "";
         this.getComments(); // 목록 새로고침
@@ -150,7 +149,6 @@ export default {
         await axios.delete(`http://127.0.0.1:8000/articles/comments/${commentId}/`, {
           headers: { Authorization: `Token ${localStorage.getItem("token")}` },
         });
-        alert("댓글이 삭제되었습니다.");
         this.getComments(); // 목록 새로고침
       } catch (error) {
         console.error("댓글 삭제 실패:", error.response?.data || error);
@@ -158,7 +156,7 @@ export default {
     },
     getProfileImage(profileImgPath) {
       if (!profileImgPath || profileImgPath === "null") {
-        return "/media/profiles/default.jpg"; // 기본 프로필 이미지 경로
+        return "/media/profiles/0.png"; // 기본 프로필 이미지 경로
       }
       return `http://127.0.0.1:8000${profileImgPath}`;
     },
@@ -227,12 +225,12 @@ export default {
   display: flex;
   align-items: center;
   gap: 10px; /* 요소 간 간격 */
-  margin-bottom: 20px; /* 각 댓글 간 간격 */
+  margin-bottom: 0px; /* 각 댓글 간 간격 */
 }
 
 .profile-img {
-  width: 30px;
-  height: 30px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
 }
 
@@ -286,5 +284,6 @@ export default {
 .btn-update:hover {
   background-color: #b9e4ca9a;
 }
+
 
 </style>

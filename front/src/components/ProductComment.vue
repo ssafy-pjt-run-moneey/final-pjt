@@ -25,7 +25,7 @@
           class="profile-img"
           @error="handleImageError"
         />
-        <span class="author-name">{{ comment.username }}</span>
+        <!-- <span class="author-name">{{ comment.username }}</span> -->
         
         <span v-if="!comment.isEditing" class="comment-content">
           {{ comment.content }}
@@ -271,13 +271,14 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   gap: 10px; /* 요소 간 간격 */
-  margin-bottom: 20px; /* 각 댓글 간 간격 */
+  margin-bottom: 0px; /* 각 댓글 간 간격 */
 }
 
 .profile-img {
-  width: 30px;
-  height: 30px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
+  margin-right: 30px;
 }
 
 
