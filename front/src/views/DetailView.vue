@@ -134,7 +134,6 @@ export default {
         await axios.delete(`${API_URL}/articles/${this.$route.params.id}/`, {
           headers: { Authorization: `Token ${localStorage.getItem("token")}` },
         });
-        alert("게시글이 삭제되었습니다.");
         this.$router.push({ name: "ArticlesView" }); // 게시글 목록으로 이동
       } catch (error) {
         console.error("게시글 삭제 실패:", error.response.data);
