@@ -3,12 +3,13 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import Article, Comment
 import openai
+from django.conf import settings
 
 # 로깅 설정
 logger = logging.getLogger(__name__)
 
 # OpenAI API 키 설정
-openai.api_key = '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'
+openai.api_key = settings.OPENAI_API_KEY
 
 @receiver(post_save, sender=Article)
 def create_auto_comment(sender, instance, created, **kwargs):
