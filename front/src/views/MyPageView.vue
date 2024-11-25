@@ -34,6 +34,7 @@
             </span>
           </div>
           <div class="profile-actions">
+            <!-- 프로필 수정 버튼 (자신의 프로필일 때) -->
             <button 
               v-if="isOwnProfile" 
               @click="editProfile" 
@@ -41,13 +42,18 @@
             >
               프로필 수정
             </button>
+            
+            <!-- 팔로우/언팔로우 버튼 (다른 사람의 프로필일 때) -->
             <button 
               v-else 
               @click="toggleFollow" 
-              class="profile-button follow-button"
-              :class="{ 'following': isFollowing }"
+              class="follow-button"
             >
-              {{ isFollowing ? '언팔로우' : '팔로우' }}
+              <img 
+                :src="isFollowing ? '/src/assets/button/unfollow.jpg' : '/src/assets/button/follow.png'"
+                alt="팔로우 버튼"
+                class="follow-icon"
+              />
             </button>
           </div>
         </div>
@@ -66,9 +72,12 @@
               <button 
                 @click="followUser(user.id)" 
                 class="follow-button"
-                :class="{ 'following': isFollowingUser(user) }"
               >
-                {{ isFollowingUser(user) ? '언팔로우' : '팔로우' }}
+                <img 
+                  :src="isFollowingUser(user) ? '/src/assets/button/unfollow.jpg' : '/src/assets/button/follow.png'"
+                  alt="팔로우 버튼"
+                  class="follow-icon"
+                />
               </button>
             </div>
           </div>
@@ -524,24 +533,22 @@ onMounted(async () => {
 .profile-section {
   background: white;
   border-radius: 15px;
-  padding: 1.5rem 10rem;  /* 위아래 1.5rem, 좌우 4rem으로 수정 */
-  margin-bottom: 2rem;
+  padding: 1.5rem 4rem;
+  margin-bottom: 3.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  max-width: 1200px;  /* 최대 너비 설정 */
-  /* margin: 0 auto;  */
 }
 
 .profile-header {
   display: grid;
-  grid-template-columns: 150px 1fr 200px;  /* 컬럼 너비 명확히 지정 */
-  gap: 3rem;  /* 간격 늘림 */
+  grid-template-columns: 150px 1fr 200px;
+  gap: 3rem;
   align-items: center;
-  min-height: 120px;  /* 높이 줄임 */
+  min-height: 120px;
 }
 
 .profile-image-container {
   display: flex;
-  justify-content: center;  /* 이미지 중앙 정렬 */
+  justify-content: center;
   width: 150px;
 }
 
@@ -560,15 +567,15 @@ onMounted(async () => {
 }
 
 .profile-info {
-  padding: 0 1.5rem;  /* 패딩 증가 */
+  padding: 0 1.5rem;
 }
 
 .user-info-group {
-  margin-top: 0.5rem;  /* 상단 여백 추가 */
-  line-height: 1.6;  /* 줄 간격 증가 */
+  margin-top: 0.5rem;
+  line-height: 1.6;
 }
 
-.user-email,.dog-type, .join-date {
+.user-email, .dog-type, .join-date {
   color: #666;
   font-size: 1rem;
   margin: 0.3rem 0;
@@ -580,12 +587,34 @@ onMounted(async () => {
   margin-bottom: 0.5rem;
 }
 
-
-.profile-actions {
-  margin-top: 1rem;
+.profile-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
 }
 
-.profile-button {
+.follow-stats {
+  display: flex;
+  gap: 2rem;
+  font-size: 1.1rem;
+}
+
+.follow-count {
+  cursor: pointer;
+  color: #47413b;
+  transition: color 0.2s;
+}
+
+.follow-count:hover {
+  color: #DDBEA9;
+}
+
+/* 프로필 수정 버튼 스타일 */
+.profile-button.edit-button {
+  background: #DDBEA9;
+  color: white;
   padding: 0.8rem 1.5rem;
   border: none;
   border-radius: 25px;
@@ -594,26 +623,29 @@ onMounted(async () => {
   transition: all 0.3s ease;
 }
 
-.edit-button {
-  background: #DDBEA9;
-  color: white;
-}
-
-.edit-button:hover {
+.profile-button.edit-button:hover {
   background: #CB997E;
 }
 
+/* 팔로우 버튼 스타일 */
 .follow-button {
-  background: #A5A58D;
-  color: white;
-}
-
-.follow-button.following {
-  background: #6B705C;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: transform 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .follow-button:hover {
-  transform: translateY(-2px);
+  transform: scale(1.1);
+}
+
+.follow-icon {
+  width: 80px;
+  height: auto;
 }
 
 .modal-overlay {
@@ -636,37 +668,6 @@ onMounted(async () => {
   max-width: 500px;
   width: 90%;
   text-align: center;
-}
-
-.modal-image {
-  width: 200px;
-  height: 200px;
-  border-radius: 50%;
-  margin: 1rem 0;
-}
-
-.profile-stats {
-  display: flex;
-  flex-direction: column;
-  align-items: center;  /* 중앙 정렬 */
-  justify-content: center;
-  gap: 1rem;
-}
-
-.follow-stats {
-  display: flex;
-  gap: 2rem;  /* 팔로워/팔로잉 간격 증가 */
-  font-size: 1.1rem;  /* 글자 크기 증가 */
-}
-
-.follow-count {
-  cursor: pointer;
-  color: #47413b;
-  transition: color 0.2s;
-}
-
-.follow-count:hover {
-  color: #DDBEA9;
 }
 
 .follow-list {
@@ -692,14 +693,6 @@ onMounted(async () => {
   flex-grow: 1;
 }
 
-.mutual-follow {
-  font-size: 0.8rem;
-  color: #A5A58D;
-  padding: 0.3rem 0.6rem;
-  background: #f5f5f5;
-  border-radius: 15px;
-}
-
 .articles-section {
   background: white;
   border-radius: 15px;
@@ -710,35 +703,6 @@ onMounted(async () => {
   overflow-y: auto;
 }
 
-.articles-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.articles-table th,
-.articles-table td {
-  padding: 0.8rem;
-  text-align: left;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.articles-table th {
-  background: #faf6f1;
-  color: #47413b;
-  font-weight: 600;
-}
-
-.article-title {
-  color: #47413b;
-  text-decoration: none;
-  cursor: pointer;
-  transition: color 0.2s;
-}
-
-.article-title:hover {
-  color: #DDBEA9;
-}
-
 .marked-products {
   background: white;
   border-radius: 15px;
@@ -746,108 +710,8 @@ onMounted(async () => {
   margin-top: 2rem;
   margin-bottom: 2rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  max-height: 350px;  /* 고정 높이 설정 */
-  overflow-y: auto;   /* 세로 스크롤 추가 */
-}
-
-.products-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-  gap: 0.8rem;
-  margin-top: 1rem;
-}
-
-.product-item {
-  background: #faf6f1;  /* 카드 배경색 변경 */
-  padding: 1rem;
-  border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  text-align: center;
-}
-
-.product-info h4 {
-  margin: 0 0 0.5rem 0;
-  font-size: 1rem;
-  color: #47413b;
-}
-
-.bank-name {
-  color: #666;
-  font-size: 0.9rem;
-  margin-bottom: 1rem;
-}
-
-.product-actions {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: center;
-}
-
-.unmark-button {
-  background: #c77e7e;  /* 마킹 취소 버튼 색상 */
-  padding: 0.4rem 0.8rem;
-  border: none;  /* 테두리 제거 */
-  border-radius: 5px;  /* 모서리 둥글게 */
-  cursor: pointer;
-  font-size: 0.8rem;
-  transition: all 0.3s ease;
-  color: white;
-}
-
-.detail-button {
-  background: #DDBEA9;  /* 상세보기 버튼 색상 */
-  padding: 0.4rem 0.8rem;
-  border: none;  /* 테두리 제거 */
-  border-radius: 5px;  /* 모서리 둥글게 */
-  cursor: pointer;
-  font-size: 0.8rem;
-  transition: all 0.3s ease;
-  color: white;
-}
-
-.unmark-button:hover {
-  background: #b76e6e;
-}
-
-.detail-button:hover {
-  background: #CB997E;
-}
-
-.rates-chart {
-  margin-top: 2rem;
-  padding: 1rem;
-  background: white;
-  border-radius: 10px;
-  height: 400px;
-}
-
-.rates-chart h3 {
-  margin-bottom: 1rem;
-  color: #47413b;
-}
-
-.dog-personality, .dog-finance {
-  margin: 0.5rem 0;
-  color: #666;
-}
-
-.profile-actions {
-  margin-top: 1rem;
-  text-align: center;  /* 버튼 중앙 정렬 */
-}
-
-.profile-actions button {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  background: #DDBEA9;
-  color: white;
-  transition: all 0.3s ease;
-}
-
-.profile-actions button:hover {
-  background: #CB997E;
+  max-height: 350px;
+  overflow-y: auto;
 }
 
 .delete-account {

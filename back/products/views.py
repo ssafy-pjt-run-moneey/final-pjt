@@ -238,7 +238,7 @@ from .serializers import ProductSerializer
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def recommendations(request):
+def result(request):
     user_type = request.user.dog_type  # 사용자의 dog_type 가져오기
     personalized_products = []
     popular_products = []
