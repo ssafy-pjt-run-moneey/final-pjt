@@ -4,9 +4,8 @@ from django.dispatch import receiver
 from .models import Article, Comment
 import openai
 from django.conf import settings
-from decouple import config
 
-openai.api_key = config('OPENAI_API_KEY')
+openai.api_key = settings.OPENAI_API_KEY
 # 로깅 설정
 logger = logging.getLogger(__name__)
 
