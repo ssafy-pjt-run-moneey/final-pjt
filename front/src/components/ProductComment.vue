@@ -20,7 +20,7 @@
     <div v-else>
       <div v-for="comment in comments" :key="comment.id" class="comment-item">
         <img 
-          :src="`http://localhost:8000${comment.user.profile_img}`" 
+          :src="getProfileImage(comment.user.profile_img)" 
           alt="프로필" 
           class="profile-img"
           @error="handleImageError"
@@ -107,6 +107,20 @@ const checkAuth = () => {
     return null
   }
   return token
+}
+
+const handleImageError = (e) => {
+  e.target.src = 'http://localhost:8000/media/profiles/0.png'
+}
+
+const getProfileImage = (profileImgPath) => {
+  if (!profileImgPath || profileImgPath === "null") {
+    return 'http://localhost:8000/media/profiles/0.png'
+  }
+  if (profileImgPath.startsWith('http')) {
+    return profileImgPath
+  }
+  return `http://localhost:8000/media/${profileImgPath}`
 }
 
 const fetchComments = async () => {
