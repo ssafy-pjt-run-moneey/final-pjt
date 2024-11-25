@@ -24,15 +24,17 @@
     <!-- 결과 모달을 game-container 밖으로 이동 -->
     <div v-if="showResult" class="result-modal">
       <div class="modal-content">
+        <button class="close-button" @click="closeResult">×</button>
         <h2>당신의 투자 성향은...</h2>
         <div class="dog-result">
           <img :src="`/${resultType}.png`" :alt="dogTypes[resultType]" />
-          <h3>{{ dogTypes[resultType] }}</h3>
-          <p>{{ dogDescriptions[resultType] }}</p>
+          <h1>{{ dogTypes[resultType] }}</h1>
+          <h3>{{ dogDescriptions[resultType] }}</h3>
+          <h1>👇</h1>
           <!-- RecommendationModal 컴포넌트 추가 -->
           <RecommendationModal v-if="showResult" @close="showResult = false" />
         </div>
-        <button @click="restartGame">다시하기</button>
+        <button @click="restartGame" class="again">다시하기</button>
       </div>
     </div>
   </div>
@@ -267,6 +269,10 @@ onUnmounted(() => {
     clearInterval(timerInterval.value)
   }
 })
+
+const closeResult = () => {
+  showResult.value = false;
+}
 </script>
 
 <style scoped>
@@ -298,11 +304,13 @@ onUnmounted(() => {
 }
 
 .start-screen, .result-modal {
+  text-align: center;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 70%; /* 가로 크기 */
+  width: 60%; /* 가로 크기 */
+  padding: 10%;
   /* max-width: 600px; 최대 가로 크기 */
   max-height: calc(100vh - 300px); /* 창 높이를 벗어나지 않도록 제한 */
   background: rgba(255, 255, 255, 0.95); /* 약간 투명한 흰색 배경 */
@@ -313,6 +321,7 @@ onUnmounted(() => {
 }
 
 .result-modal {
+  text-align: center;
   z-index: 1000; /* 다른 요소들 위에 표시되도록 설정 */
 }
 
@@ -408,5 +417,28 @@ button:hover{
 .answer{
   font-size: 18px;
   margin-top: 10px;
+}
+
+.again{
+  margin: 20px;
+}
+
+/* .result-modal {
+  position: relative;
+} */
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #333;
+}
+
+.close-button:hover {
+  color: #000;
 }
 </style>

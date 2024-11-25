@@ -5,12 +5,10 @@
       <div class="profile-header">
         <!-- 왼쪽: 프로필 이미지 -->
         <div class="profile-image-container">
-          <img 
-            :src="userProfile.profile_img || '/profiles/0.png'" 
-            @click="showRecommendationModal = true"
-            class="profile-image" 
-            alt="프로필 이미지"
-          />
+          <img :src="userProfile.profile_img || '/profiles/0.png'" 
+              @click="showRecommendationModal = true" 
+              class="profile-image" 
+              alt="프로필 이미지" />
         </div>
 
         <!-- 중앙: 유저 정보 -->
@@ -162,15 +160,20 @@
       </div>
     </div>
 
-
     <!-- 회원 탈퇴 버튼 -->
     <button v-if="isOwnProfile" @click="confirmDelete" class="delete-account">
       회원 탈퇴
     </button>
+
+    <!-- RecommendationModal 추가 -->
+    <RecommendationModal v-if="showRecommendationModal" 
+                          @close="showRecommendationModal = false" 
+                          :dogType="userProfile.dog_type" />
   </div>
 </template>
 
 <script setup>
+import RecommendationModal from '@/components/RecommendationModal.vue'
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
@@ -195,6 +198,8 @@ ChartJS.register(
   Tooltip,
   Legend
 )
+
+const showRecommendationModal = ref(false)
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()

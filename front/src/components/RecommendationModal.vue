@@ -2,7 +2,7 @@
   <div class="recommendation-container">
     <!-- 당신에게 맞는 상품 -->
     <div class="recommendation-section">
-      <h2>당신에게 맞는 상품</h2>
+      <h2>당신에게 추천하는 상품</h2>
       <div v-if="personalizedProducts.length" class="products-grid">
         <div v-for="product in personalizedProducts" :key="product.fin_prdt_cd" class="product-card">
           <div class="card-header">
@@ -43,7 +43,7 @@
 
     <!-- 비슷한 사람들이 많이 마킹한 상품 -->
     <div class="recommendation-section">
-      <h2>비슷한 사람들이 많이 마킹한 상품</h2>
+      <h2>이 강아지가 많이 마킹한 상품</h2>
       <div v-if="popularProducts.length" class="products-grid">
         <div v-for="product in popularProducts" :key="product.fin_prdt_cd" class="product-card">
           <div class="card-header">
@@ -130,20 +130,16 @@ onMounted(fetchRecommendations)
 </script>
 
 <style scoped>
-.recommendation-container {
+.products-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
-}
-
-.recommendation-section {
-  margin-bottom: 2rem;
+  padding: 2rem 4rem;
 }
 
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 2rem;
 }
 
 .product-card {
@@ -151,24 +147,131 @@ onMounted(fetchRecommendations)
   border-radius: 15px;
   padding: 1.5rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 1px solid #f7f1ee;
+  display: flex;
+  flex-direction: column;
+  height: auto;  /* 높이를 컨텐츠에 맞게 조정 */
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+}
+
+.product-title {
+  color: #47413b;
+  font-size: 1.2rem;
+  margin: 0;
+  line-height: 1.4;
 }
 
 .card-header h3 {
   color: #47413b;
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+  gap: 1rem;
 }
 
 .product-type-badge {
+  display: inline-block;
   background: #CB997E;
   color: white;
   padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
-.card-body .info-item {
+.card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  flex: 1;
+}
+
+.info-item {
   display: flex;
   justify-content: space-between;
+  padding: 0.5rem;
+  border-bottom: 1px solid #f7f2ee;
+  transition: background-color 0.2s ease;
+}
+
+.info-item:last-child {
+  border-bottom: none;
+}
+
+.info-item:hover {
+  background-color: #fcfaf8;
+}
+
+.info-item .label {
+  color: #47413b;
+  font-weight: 500;
+  font-size: 0.9rem;
+  position: relative;
+  padding-left: 1.2rem;
+}
+
+.info-item .label::before {
+  content: '🐶';
+  position: absolute;
+  left: 0;
+  font-size: 0.8rem;
+}
+
+.info-item .value {
+  color: #2c2a26;
+  font-size: 0.9rem;
+  text-align: right;
+  max-width: 60%;
 }
 
 .mark-button, .detail-button {
-  padding: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.mark-button {
+  background: #DDBEA9;
+  color: white;
+}
+
+.mark-button.marked {
+  background: #CB997E;
+}
+
+.detail-button {
+  background: #A5A58D;
+  color: white;
+}
+
+.mark-button:hover {
+  background: #CB997E;
+}
+
+.detail-button:hover {
+  background: #B7B7A4;
 }
 </style>
