@@ -1,94 +1,103 @@
 <template>
-  <div v-if="product" class="product-detail">
-    <div class="product-header">
-      <div class="header-content">
-        <h1>{{ product.fin_prdt_nm }}</h1>
-        <span class="product-type-badge">
-          {{ product.product_type === 'deposit' ? '예금' : '적금' }}
-        </span>
-      </div>
-      <button 
-        class="mark-button" 
-        :class="{ marked: product.is_marked }" 
-        @click="handleMark(product)"
-      >
-        {{ product.is_marked ? '마킹 취소🐾' : '마킹하기🐾' }}
-      </button>
-    </div>
-    
-
-    <div class="info-card">
-      <div class="info-item">
-        <span class="label">은행</span>
-        <span>{{ product.kor_co_nm }}</span>
-      </div>
-      <div class="info-item">
-        <span class="label">공시 월</span>
-        <span>{{ product.dcls_month }}</span>
-      </div>
-      <div class="info-item">
-        <span class="label">가입방법</span>
-        <span>{{ product.join_way }}</span>
-      </div>
-      <div class="info-item">
-        <span class="label">가입대상</span>
-        <span>{{ product.join_member }}</span>
-      </div>
-      <div class="info-item">
-        <span class="label">가입제한</span>
-        <span>{{ product.join_deny ? '제한있음' : '제한없음' }}</span>
-      </div>
-      <div class="info-item">
-        <span class="label">우대조건</span>
-        <span>{{ product.spcl_cnd }}</span>
-      </div>
-      <div class="info-item">
-        <span class="label">기타 유의사항</span>
-        <span>{{ product.etc_note }}</span>
+  <div class="product-container">
+    <div v-if="product" class="product-detail">
+      <div class="product-header">
+        <div class="header-content">
+          <h1>{{ product.fin_prdt_nm }}</h1>
+          <span class="product-type-badge">
+            {{ product.product_type === 'deposit' ? '예금' : '적금' }}
+          </span>
+        </div>
+        <button 
+          class="mark-button" 
+          :class="{ marked: product.is_marked }" 
+          @click="handleMark(product)"
+        >
+          {{ product.is_marked ? '마킹 취소🐾' : '마킹하기🐾' }}
+        </button>
       </div>
       
-      <div class="rates-section">
-        <h3>금리 정보</h3>
-        <div v-for="option in product.options" :key="option.save_trm" class="rate-item">
-          <div class="term-info">{{ option.save_trm }}개월</div>
-          <div class="rate-details">
-            <div>
-              <span class="rate-label">금리유형:</span>
-              <span>{{ option.intr_rate_type_nm }}</span>
-            </div>
-            <div>
-              <span class="rate-label">기본금리:</span>
-              <span>{{ option.intr_rate }}%</span>
-            </div>
-            <div>
-              <span class="rate-label">우대금리:</span>
-              <span>{{ option.intr_rate2 }}%</span>
+
+      <div class="info-card">
+        <div class="info-item">
+          <span class="label">은행</span>
+          <span>{{ product.kor_co_nm }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">공시 월</span>
+          <span>{{ product.dcls_month }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">가입방법</span>
+          <span>{{ product.join_way }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">가입대상</span>
+          <span>{{ product.join_member }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">가입제한</span>
+          <span>{{ product.join_deny ? '제한있음' : '제한없음' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">우대조건</span>
+          <span>{{ product.spcl_cnd }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">기타 유의사항</span>
+          <span>{{ product.etc_note }}</span>
+        </div>
+        
+        <div class="rates-section">
+          <h3>금리 정보</h3>
+          <div v-for="option in product.options" :key="option.save_trm" class="rate-item">
+            <div class="term-info">{{ option.save_trm }}개월</div>
+            <div class="rate-details">
+              <div>
+                <span class="rate-label">금리유형:</span>
+                <span>{{ option.intr_rate_type_nm }}</span>
+              </div>
+              <div>
+                <span class="rate-label">기본금리:</span>
+                <span>{{ option.intr_rate }}%</span>
+              </div>
+              <div>
+                <span class="rate-label">우대금리:</span>
+                <span>{{ option.intr_rate2 }}%</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="chart-card">
-      <h2><금리 비교></h2>
-      <div v-if="chartData.labels.length" class="chart-container">
-        <Bar :options="chartOptions" :data="chartData" />
+      <div class="chart-card">
+        <h2>금리 비교</h2>
+        <div v-if="chartData.labels.length" class="chart-container">
+          <Bar :options="chartOptions" :data="chartData" />
+        </div>
       </div>
+      <!-- 댓글 컴포넌트 추가 -->
+      <ProductComment 
+        v-if="product" 
+        :productId="product.fin_prdt_cd" 
+      />
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useFinanceStore } from '@/stores/finance'
 import { Bar } from 'vue-chartjs'
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
+import ProductComment from '@/components/ProductComment.vue'
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, ChartDataLabels)
 
 const route = useRoute()
+const router = useRouter()
 const financeStore = useFinanceStore()
 const product = ref(null)
 
@@ -126,6 +135,7 @@ const chartData = computed(() => {
     ]
   }
 })
+
 
 const handleMark = async (product) => {
   const token = localStorage.getItem('token')
@@ -165,10 +175,17 @@ const chartOptions = computed(() => ({
   }
 }))
 
+
 onMounted(async () => {
-  const productId = route.params.id
-  await financeStore.fetchProductDetail(productId)
-  product.value = financeStore.selectedProduct
+  try {
+    const productId = route.params.id
+    if (productId) {
+      await financeStore.fetchProductDetail(productId)
+      product.value = financeStore.selectedProduct
+    }
+  } catch (error) {
+    console.error('상품 정보 로드 실패:', error)
+  }
 })
 </script>
 
@@ -340,4 +357,5 @@ onMounted(async () => {
   margin: 2rem auto;
   width: 90%;  /* 80%에서 90%로 조정하여 차트 크기 최적화 */
 }
+
 </style>

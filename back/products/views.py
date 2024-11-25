@@ -119,6 +119,7 @@ def mark_product(request, fin_prdt_cd):
     return Response({'status': 'marked'})
 
 @api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
 def product_comments(request, pk):
     product = get_object_or_404(Product, pk=pk)
     
@@ -126,15 +127,32 @@ def product_comments(request, pk):
         comments = ProductComment.objects.filter(product=product).select_related('user')
         serializer = ProductCommentSerializer(comments, many=True)
         return Response(serializer.data)
-    
+        
     elif request.method == 'POST':
-        if not request.user.is_authenticated:
-            return Response(status=401)
         serializer = ProductCommentSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(user=request.user, product=product)
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
+
+@api_view(['PUT', 'DELETE'])
+@permission_classes([IsAuthenticated])
+def comment_detail(request, product_pk, comment_pk):
+    comment = get_object_or_404(ProductComment, pk=comment_pk, product__fin_prdt_cd=product_pk)
+    
+    if comment.user != request.user:
+        return Response({'error': '권한이 없습니다.'}, status=403)
+    
+    if request.method == 'PUT':
+        serializer = ProductCommentSerializer(comment, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+        
+    elif request.method == 'DELETE':
+        comment.delete()
+        return Response(status=204)
     
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

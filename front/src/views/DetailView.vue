@@ -106,7 +106,7 @@ export default {
     },
     getProfileImage(profileImgPath) {
       if (!profileImgPath || profileImgPath === "null") {
-        return "/media/profiles/default.jpg"; // 기본 프로필 이미지 경로
+        return "/media/profiles/0.png"; // 기본 프로필 이미지 경로
       }
       return `http://127.0.0.1:8000${profileImgPath}`;
     },
@@ -134,6 +134,7 @@ export default {
         await axios.delete(`${API_URL}/articles/${this.$route.params.id}/`, {
           headers: { Authorization: `Token ${localStorage.getItem("token")}` },
         });
+        alert("게시글이 삭제되었습니다.");
         this.$router.push({ name: "ArticlesView" }); // 게시글 목록으로 이동
       } catch (error) {
         console.error("게시글 삭제 실패:", error.response.data);
@@ -188,9 +189,9 @@ export default {
   width: 100%;
 }
 
-hr {
+/* hr {
   margin: 20px;
-}
+} */
 
 .article-content p {
   padding: 10px;

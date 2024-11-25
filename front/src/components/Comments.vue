@@ -36,23 +36,21 @@
 
         <!-- 수정 및 삭제 버튼 -->
         <div v-if="isAuthor(comment)" class="action-buttons">
-          <template v-if="editingComment && editingComment.id === comment.id">
-            <button
-              @click="updateComment(comment)"
-              class="btn-update"
-            >
-              수정 완료
-            </button>
-          </template>
-          <template v-else>
-            <button
-              @click="startEditing(comment)"
-              class="btn-edit"
-            >
-              수정
-            </button>
-            <button @click="deleteComment(comment.id)" class="btn-delete">삭제</button>
-          </template>
+          <button
+            v-if="editingComment && editingComment.id === comment.id"
+            @click="updateComment(comment)"
+            class="btn-update"
+          >
+            수정하기
+          </button>
+          <button
+            v-else
+            @click="startEditing(comment)"
+            class="btn-edit"
+          >
+            수정
+          </button>
+          <button @click="deleteComment(comment.id)" class="btn-delete">삭제</button>
         </div>
       </div>
     </div>
@@ -137,6 +135,7 @@ export default {
           { content: this.editingContent },
           { headers: { Authorization: `Token ${localStorage.getItem("token")}` } }
         );
+        alert("댓글이 수정되었습니다.");
         this.editingComment = null; // 수정 상태 초기화
         this.editingContent = "";
         this.getComments(); // 목록 새로고침
@@ -151,6 +150,7 @@ export default {
         await axios.delete(`http://127.0.0.1:8000/articles/comments/${commentId}/`, {
           headers: { Authorization: `Token ${localStorage.getItem("token")}` },
         });
+        alert("댓글이 삭제되었습니다.");
         this.getComments(); // 목록 새로고침
       } catch (error) {
         console.error("댓글 삭제 실패:", error.response?.data || error);
@@ -242,11 +242,8 @@ export default {
 .comment-content {
 }
 
-/* 날짜 스타일 수정 */
 .created-at {
   margin-left: auto; /* 날짜를 오른쪽으로 정렬 */
-  font-size: 0.8em; /* 글자 크기 줄이기 */
-  color: #888; /* 글자 색상을 연하게 설정 */
 }
 
 /* 댓글 입력창 */
@@ -256,19 +253,14 @@ export default {
   border: 1px solid #ddd;
 }
 
-/* 버튼 스타일 수정 */
-.action-buttons {
-  display: flex;
-  gap: 5px; /* 버튼 사이의 간격 설정 */
-}
-
+/* 버튼 스타일 */
 .btn-edit,
 .btn-delete,
 .btn-update {
   padding: 5px 10px;
   border-radius: 5px;
-  border: none;
-  font-size: 0.9em; /* 버튼 글자 크기 약간 줄이기 */
+  border: none; /* 버튼의 선 제거 */
+  margin: 0 2px;
 }
 
 .btn-edit {

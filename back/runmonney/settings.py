@@ -17,7 +17,7 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+
 FSS_API_KEY = os.getenv('FSS_API_KEY')
 if not FSS_API_KEY:
     raise ValueError("FSS_API_KEY is not set")

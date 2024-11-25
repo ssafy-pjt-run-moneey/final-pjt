@@ -26,8 +26,8 @@ class ProductSerializer(serializers.ModelSerializer):
 
 class ProductCommentSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username', read_only=True)
-
+    
     class Meta:
         model = ProductComment
-        fields = ['id', 'content', 'created_date', 'updated_date', 'username']
-        read_only_fields = ['user']
+        fields = ['id', 'content', 'created_date', 'updated_date', 'username', 'user']
+        read_only_fields = ['user', 'created_date', 'updated_date']

@@ -5,6 +5,12 @@ import api from '@/api'
 export const useUserStore = defineStore('user', () => {
   const currentUser = ref(null)
   const userProfile = ref(null)
+  const followers = ref([])
+  const followings = ref([])
+
+  const setCurrentUser = (user) => {
+    currentUser.value = user
+  }
 
   const fetchUserProfile = async () => {
     try {
@@ -13,27 +19,18 @@ export const useUserStore = defineStore('user', () => {
         router.push('/login')
         return
       }
-      
-      // URL에서 사용자 ID를 가져옴
-      const userId = route.params.id
-      const url = userId ? `/accounts/profile/${userId}/` : '/accounts/profile/'
-      
-      const response = await api.get(url, {
-        headers: {
-          Authorization: `Token ${token}`
-        }
+
+      const response = await api.get('/accounts/profile/', {
+        headers: { Authorization: `Token ${token}` }
       })
-      userProfile.value = response.data
       
-      // 디버깅용 로그
-      console.log('Current user:', userStore.currentUser)
-      console.log('Profile:', userProfile.value)
+      userProfile.value = response.data
+      setCurrentUser(response.data)
       
       // 팔로워/팔로잉 상태 업데이트
-      if (userProfile.value) {
-        followers.value = userProfile.value.followers || []
-        followings.value = userProfile.value.following || []
-      }
+      followers.value = response.data.followers || []
+      followings.value = response.data.following || []
+      
     } catch (error) {
       console.error('프로필 조회 실패:', error)
     }
@@ -52,6 +49,7 @@ export const useUserStore = defineStore('user', () => {
   const toggleFollow = async (userId) => {
     try {
       const response = await api.post(`/accounts/follow/${userId}/`)
+      await fetchUserProfile()  // 팔로우 상태 업데이트를 위해 프로필 새로고침
       return response.data
     } catch (error) {
       console.error('팔로우 처리 실패:', error)
@@ -63,6 +61,9 @@ export const useUserStore = defineStore('user', () => {
     try {
       await api.delete('/accounts/profile/delete/')
       currentUser.value = null
+      userProfile.value = null
+      followers.value = []
+      followings.value = []
     } catch (error) {
       console.error('계정 삭제 실패:', error)
       throw error
@@ -72,6 +73,9 @@ export const useUserStore = defineStore('user', () => {
   return {
     currentUser,
     userProfile,
+    followers,
+    followings,
+    setCurrentUser,
     fetchUserProfile,
     updateProfile,
     toggleFollow,
