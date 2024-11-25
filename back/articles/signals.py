@@ -4,12 +4,11 @@ from django.dispatch import receiver
 from .models import Article, Comment
 import openai
 from django.conf import settings
+from decouple import config
 
+openai.api_key = config('OPENAI_API_KEY')
 # 로깅 설정
 logger = logging.getLogger(__name__)
-
-# OpenAI API 키 설정
-openai.api_key = settings.OPENAI_API_KEY
 
 @receiver(post_save, sender=Article)
 def create_auto_comment(sender, instance, created, **kwargs):
