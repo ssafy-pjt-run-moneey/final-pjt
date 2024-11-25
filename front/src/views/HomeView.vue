@@ -3,7 +3,7 @@
     <section class="carousel-section">
       <Carousel
         :autoplay="3000"
-        :height="400"
+        :height="500"
         :wrap-around="true"
         :items-to-show="2"
         :snap-align="'center'"
@@ -44,59 +44,60 @@ const updateSlide = (val) => {
 const carouselItems = [
   {
     title: "/test",
-    description: "난 무슨 강아지?\n게임하고 금융 상품 추천 받자!",
+    description: "난 무슨 강아지?\n게임하고\n금융 상품 추천 받자!",
     buttonText: "달려가기",
-    image: '/15.png',
+    image: '/20.png',
   },
   {
     title: "/products",
-    description: "내가 원하는 조건의\n금융 상품을 한 눈에!",
+    description: "내가 원하는 조건의\n금융 상품을\n한 눈에!",
     buttonText: "상품보기",
-    image: '/10.png',
+    image: '/21.png',
   },
   {
     title: "/articles",
-    description: "다른 사람들은\n어떻게 돈 관리를 하고 있을까?",
+    description: "다른 사람들은\n어떻게\n돈 관리를\n하고 있을까?",
     buttonText: "소통하기",
-    image: '/4.png',
+    image: '/22.png',
   },
   {
     title: "/map",
-    description: "나에게 가장 가까운\n은행은 어디에 있을까?",
+    description: "나에게\n가장 가까운 은행은\n어디에 있을까?",
     buttonText: "검색하기",
-    image: '/9.png',
+    image: '/23.png',
   },
   {
     title: "/exchange",
-    description: "환율 계산기로\n여행 준비를 완벽하게!",
+    description: "환율 계산기로\n여행 준비를\n완벽하게!",
     buttonText: "계산하기",
-    image: '/2.png',
+    image: '/24.png',
   },
 ]
 </script>
 
 <style scoped>
 .carousel-section {
-  padding: 40px 0;
+  padding: 80px 0; /* 패딩 증가 */
   background-color: #FFF8F3;
 }
 
 .carousel {
   margin: 0 auto;
-  max-width: 1200px;
+  max-width: 1400px;
 }
 
 .carousel-card {
   display: flex;
   background-color: #a5a58d;
   border-radius: 20px;
-  padding: 40px;
-  margin: 20px;
-  min-height: 400px;
+  padding: 40px 50px; /* 상하 패딩 조정 */
+  margin: 30px; /* 마진 증가 */
+  height: 440px; /* 고정 높이 설정 */
   transform: scale(0.9);
   transition: all 0.5s ease;
   opacity: 0.7;
-  border: none; /* Remove any potential borders */
+  border: none;
+  overflow: hidden; /* 내용이 넘치지 않도록 */
 }
 
 .carousel-card.current {
@@ -108,46 +109,46 @@ const carouselItems = [
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between; /* 내용 분산 */
   align-items: flex-start;
-  padding-right: 10px;
+  padding-right: 20px;
 }
 
 .carousel-image {
-  flex: 1;
+  flex: 1.5;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 .carousel-image img {
-  max-width: 90%;
-  max-height: 200px; /* Reduced image size */
+  max-width: 100%;
+  max-height: 280px; /* 이미지 높이 조정 */
   object-fit: contain;
 }
 
 .description {
-  font-size: 1.8rem;
-  color: #ffffff; /* Changed to white for better contrast */
-  margin-bottom: 40px;
+  font-size: 1.5rem; /* 글씨 크기 약간 조정 */
+  color: #ffffff;
+  margin-bottom: 30px;
   font-weight: 600;
   line-height: 1.4;
   letter-spacing: -0.5px;
   word-break: keep-all;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); /* Added subtle text shadow */
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .action-button {
   background-color: #706873;
   color: white;
   border: none;
-  padding: 15px 35px; /* Slightly wider button */
-  border-radius: 12px; /* Rounder corners */
-  font-size: 1.2rem;
-  font-weight: 600; /* Bolder text */
+  padding: 15px 35px;
+  border-radius: 12px;
+  font-size: 1.1rem; /* Slightly reduced font size */
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .action-button:hover {
@@ -186,7 +187,9 @@ const carouselItems = [
 @media (max-width: 768px) {
   .carousel-card {
     flex-direction: column;
-    padding: 20px;
+    padding: 30px;
+    height: auto; /* 모바일에서는 자동 높이 */
+    min-height: 450px; /* 최소 높이 설정 */
   }
 
   .carousel-content {
@@ -197,17 +200,17 @@ const carouselItems = [
   }
 
   .description {
-    font-size: 1.4rem; /* Adjusted for mobile */
-    margin-bottom: 30px;
+    font-size: 1.2rem; /* 모바일에서 글씨 크기 조정 */
+    margin-bottom: 20px;
   }
 
   .action-button {
-    padding: 12px 28px;
-    font-size: 1.1rem;
+    padding: 10px 25px;
+    font-size: 1rem;
   }
 
   .carousel-image img {
-    max-height: 180px; /* Smaller images on mobile */
+    max-height: 200px;
   }
 }
 </style>
