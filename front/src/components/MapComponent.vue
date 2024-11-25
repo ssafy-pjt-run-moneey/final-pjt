@@ -76,10 +76,28 @@ const searchBanks = () => {
         // Create infowindow
         const infowindow = new window.kakao.maps.InfoWindow({
           content: `
-            <div style="padding:8px;font-size:15px;">
-              ${place.place_name}<br>
-              ${place.address_name}<br>
-              ${place.phone ? `${place.phone}<br>` : ''}<br>
+            <div style="padding: 15px; min-width: 250px; text-align: center; border-radius: 8px; font-family: Arial, sans-serif;">
+              <h3 style="margin: 0 0 10px 0; font-size: 16px; color: #47413b;">
+                ${place.place_name}
+              </h3>
+              <hr style="border: none; height: 1px; background-color: #DDBEA9; margin: 10px 0;">
+              <div style="text-align: left; font-size: 13px; color: #666;">
+                <p style="margin: 8px 0;">
+                  <span style="color: #A5A58D; font-weight: bold;">주소:</span> ${place.address_name}
+                </p>
+                ${place.phone ? 
+                  `<p style="margin: 8px 0;">
+                    <span style="color: #A5A58D; font-weight: bold;">전화:</span> ${place.phone}
+                  </p>` 
+                  : ''
+                }
+                ${place.operating_hours ? 
+                  `<p style="margin: 8px 0;">
+                    <span style="color: #A5A58D; font-weight: bold;">영업시간:</span> ${place.operating_hours}
+                  </p>`
+                  : ''
+                }
+              </div>
             </div>
           `
         })

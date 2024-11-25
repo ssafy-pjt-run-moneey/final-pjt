@@ -222,28 +222,169 @@ def subscribe_product(request, fin_prdt_cd):
 
 # products/views.py
 
+from django.db.models import Q
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from .models import Product, Option
+from .serializers import ProductSerializer
+
+from django.db.models import Q, Count
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from .models import Product, Option, ProductMark
+from .serializers import ProductSerializer
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def recommendations(request):
-    user_type = request.user.dog_type
-    
-    # 개인화된 추천 상품
-    personalized_products = Product.objects.filter(
-        options__intr_rate__gt=0,
-        product_type='deposit' if user_type % 2 == 0 else 'savings'
-    ).distinct()[:4]  # distinct() 추가하여 중복 제거
+    user_type = request.user.dog_type  # 사용자의 dog_type 가져오기
+    personalized_products = []
+    popular_products = []
 
-    # 비슷한 성향의 사람들이 많이 마킹한 상품
-    similar_users = User.objects.filter(dog_type=user_type)
-    popular_products_ids = ProductMark.objects.filter(user__in=similar_users).values('product').annotate(
-        mark_count=Count('product')
-    ).order_by('-mark_count').values_list('product', flat=True)[:4]
-    popular_products = Product.objects.filter(fin_prdt_cd__in=popular_products_ids)
+    # 기본 쿼리셋 가져오기
+    products = Product.objects.prefetch_related('options')
 
-    serializer_personalized = ProductSerializer(personalized_products, many=True)
-    serializer_popular = ProductSerializer(popular_products, many=True)
+    # 각 dog_type에 따른 조건 설정
+    if user_type == 1:  # 비숑 (XXXX)
+        personalized_products = products.filter(
+            options__save_trm__lte=6,  # 6개월 이하 단기 상품
+            product_type='deposit'
+        ).distinct()[:4]
+
+    elif user_type == 2:  # 푸들 (XXXO)
+        personalized_products = products.filter(
+            product_type='savings',  # 적금 상품
+            options__intr_rate__gt=0  # 금리가 0보다 큰 상품
+        ).distinct()[:4]
+
+    elif user_type == 3:  # 치와와 (XXOX)
+        personalized_products = products.filter(
+            product_type='deposit',
+            options__save_trm__lte=3,  # 3개월 이하 단기 상품
+            options__intr_rate__gt=0
+        ).distinct()[:4]
+
+    elif user_type == 4:  # 슈나우저 (XXOO)
+        personalized_products = products.filter(
+            product_type='savings',
+            options__save_trm__lte=12,  # 1년 이하 상품
+            options__intr_rate__gt=0
+        ).distinct()[:4]
+
+    elif user_type == 5:  # 사모예드 (XOXX)
+        filtered_products = []
+        for product in products.filter(product_type='savings'):
+            for option in product.options.all():
+                if option.save_trm >= 24 and option.intr_rate2 > option.intr_rate:
+                    filtered_products.append(product)
+                    break
+        personalized_products = filtered_products[:4]
+
+    elif user_type == 6:  # 바셋하운드 (XOXO)
+        filtered_products = []
+        for product in products.filter(product_type='deposit'):
+            for option in product.options.all():
+                if option.save_trm >= 12 and option.intr_rate > 0:
+                    filtered_products.append(product)
+                    break
+        personalized_products = filtered_products[:4]
+
+    elif user_type == 7:  # 코커스파니엘 (XOOX)
+        filtered_products = []
+        for product in products.filter(product_type='savings'):
+            for option in product.options.all():
+                if option.save_trm >= 36 and option.intr_rate2 > option.intr_rate:
+                    filtered_products.append(product)
+                    break
+        personalized_products = filtered_products[:4]
+
+    elif user_type == 8:  # 보더콜리 (XOOO)
+        filtered_products = []
+        for product in products.filter(product_type='savings'):
+            for option in product.options.all():
+                if option.save_trm >= 60 and "목표" in product.spcl_cnd:
+                    filtered_products.append(product)
+                    break
+        personalized_products = filtered_products[:4]
+
+    elif user_type == 9:  # 포메라니안 (OXXX)
+        filtered_products = []
+        for product in products.filter(product_type='deposit'):
+            for option in product.options.all():
+                if option.save_trm <= 6 and option.intr_rate2 > option.intr_rate:
+                    filtered_products.append(product)
+                    break
+        personalized_products = filtered_products[:4]
+
+    elif user_type == 10:  # 파피용 (OXXO)
+        filtered_products = []
+        for product in products.filter(product_type='savings'):
+            if "자유" in product.spcl_cnd:
+                filtered_products.append(product)
+                break
+        personalized_products = filtered_products[:4]
+
+    elif user_type == 11:  # 웰시코기 (OXOX)
+        personalized_products = products.filter(
+            product_type='deposit',
+            spcl_cnd__icontains="입출금 자유"  # 입출금 자유로운 상품
+        ).distinct()[:4]
+
+    elif user_type == 12:  # 불독 (OXOO)
+        personalized_products = products.filter(
+            product_type='deposit',
+            spcl_cnd__icontains="변동 금리"  # 변동 금리 혜택이 있는 상품
+        ).distinct()[:4]
+
+    elif user_type == 13:  # 비글 (OOXX)
+        filtered_products = []
+        for product in products.filter(product_type='savings'):
+            for option in product.options.all():
+                if option.save_trm >= 60 and "목표" in product.spcl_cnd:
+                    filtered_products.append(product)
+                    break
+        personalized_products = filtered_products[:4]
+
+    elif user_type == 14:  # 시츄 (OOXO)
+        filtered_products = []
+        for product in products.filter(product_type='savings'):
+            if "자유 납입 가능" in product.spcl_cnd:
+                filtered_products.append(product)
+                break
+        personalized_products = filtered_products[:4]
+
+    elif user_type == 15:  # 닥스훈트 (OOOX)
+        filtered_products = []
+        for product in products.filter(product_type='savings'):
+            if "목표 설정 가능" in product.spcl_cnd:
+                filtered_products.append(product)
+                break
+        personalized_products = filtered_products[:4]
+
+    elif user_type == 16:  # 저먼셰퍼드 (OOOO)
+        personalized_products = products.filter(
+            product_type='deposit',
+            spcl_cnd__icontains="장기 수익률 보증"
+        ).distinct()[:4]
+
+    # 비슷한 사람들이 많이 마킹한 상품 찾기
+    similar_users = request.user.__class__.objects.filter(dog_type=user_type)  
+    popular_product_ids = (
+        ProductMark.objects.filter(user__in=similar_users)
+        .values('product')
+        .annotate(mark_count=Count('product'))
+        .order_by('-mark_count')[:4]
+        .values_list('product', flat=True)
+    )
+    popular_products = Product.objects.filter(fin_prdt_cd__in=popular_product_ids)
+
+    # 직렬화 및 응답 반환
+    serializer_personalized = ProductSerializer(personalized_products, many=True, context={'request': request})
+    serializer_popular = ProductSerializer(popular_products, many=True, context={'request': request})
 
     return Response({
         'personalized': serializer_personalized.data,
-        'popular': serializer_popular.data
+        'popular': serializer_popular.data,
     })

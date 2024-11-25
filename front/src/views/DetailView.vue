@@ -7,29 +7,21 @@
 
       <!-- 작성자 정보 -->
       <div class="author-info">
-        <img
-          :src="getProfileImage(article.profile_img)"
-          alt="프로필 이미지"
-          class="profile-img"
-        />
-        <div>
-          <p class="author-name">{{ article.username }}</p>
-          <p class="created-at">작성일: {{ formatDate(article.created_at) }}</p>
+        <div class="author-profile" @click="goToProfile(article.user_id)" style="cursor: pointer">
+          <img
+            :src="getProfileImage(article.profile_img)"
+            alt="프로필 이미지"
+            class="profile-img"
+          />
+          <div>
+            <p class="author-name underline">{{ article.username }}</p>
+            <p class="created-at">작성일: {{ formatDate(article.created_at) }}</p>
+          </div>
         </div>
         <!-- 수정 및 삭제 버튼 -->
         <div v-if="isAuthor" class="action-buttons">
-          <button
-            @click="goToUpdatePage"
-            class="btn-update"
-          >
-            수정하기
-          </button>
-          <button
-            @click="deleteArticle"
-            class="btn-delete"
-          >
-            삭제하기
-          </button>
+          <button @click="goToUpdatePage" class="btn-update">수정하기</button>
+          <button @click="deleteArticle" class="btn-delete">삭제하기</button>
         </div>
       </div>
 
@@ -126,6 +118,14 @@ export default {
 
       return `${year}년-${month}월-${day}일 ${hours}:${minutes}`;
     },
+    goToProfile(userId) {
+      if (userId) {
+        this.$router.push({ 
+          name: 'MyPageView', 
+          params: { id: userId }
+        });
+      }
+    },
     goToUpdatePage() {
       // 수정 페이지로 이동
       this.$router.push({ name: "UpdateView", params: { id: this.$route.params.id } });
@@ -164,6 +164,18 @@ export default {
   font-size: 24px;
   font-weight: bold;
   text-align: center;
+}
+
+.author-profile {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.author-profile:hover {
+  opacity: 0.8;
 }
 
 .author-info {

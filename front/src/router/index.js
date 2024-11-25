@@ -49,6 +49,20 @@ const router = createRouter({
       meta: { requiresAuth: true },  // 인증 필요
     },
     {
+      path: '/mypage/:id?',  // id를 선택적 파라미터로 설정
+      name: 'MyPageView',
+      component: MyPageView,
+      meta: { requiresAuth: true },
+      beforeEnter: (to, from, next) => {
+        const store = useCounterStore()
+        if (!store.isLogin) {
+          next('/login')
+        } else {
+          next()
+        }
+      }
+    },
+    {
       path: '/login',
       name: 'LogInView',
       component: LogInView,

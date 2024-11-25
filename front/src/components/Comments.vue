@@ -23,7 +23,13 @@
           alt="프로필 이미지"
           class="profile-img"
         />
-        <span class="author-name">{{ comment.username }}</span> :
+        <span 
+          class="author-name" 
+          @click="goToProfile(comment.user_id)" 
+          style="cursor: pointer;"
+        >
+          {{ comment.username }}
+        </span> :
 
         <!-- 댓글 내용 또는 입력창 -->
         <span v-if="editingComment && editingComment.id === comment.id">
@@ -119,6 +125,7 @@ export default {
     isAuthor(comment) {
       return this.currentUser && this.currentUser === comment.username; // 현재 사용자와 댓글 작성자 비교
     },
+  
     startEditing(comment) {
       this.editingComment = comment; // 현재 수정 중인 댓글 저장
       this.editingContent = comment.content; // 수정 중인 댓글 내용 저장
@@ -159,6 +166,14 @@ export default {
         return "/media/profiles/0.png"; // 기본 프로필 이미지 경로
       }
       return `http://127.0.0.1:8000${profileImgPath}`;
+    },
+    goToProfile(userId) {
+      if (userId) {
+        this.$router.push({ 
+          name: 'MyPageView', 
+          params: { id: userId }
+        });
+      }
     },
     formatDate(datetime) {
       const dateObj = new Date(datetime);
@@ -232,12 +247,6 @@ export default {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-}
-
-.author-name {
-}
-
-.comment-content {
 }
 
 .created-at {

@@ -11,7 +11,7 @@
         <button @click="startGame">게임 시작</button>
       </div>
       <div v-else class="game-area">
-        <img class="dog" :style="dogStyle" src="/dogs/default/running.gif" alt="Running Dog">
+        <img class="dog" :style="dogStyle" src="`/dogs/default/running.gif`" alt="Running Dog">
         <div v-if="showQuestion && currentQuestionIndex < questions.length" class="question-modal">
           <h3 class="question-text" v-html="questions[currentQuestionIndex].text"></h3>
           <div class="timer">{{ timer }}</div>
@@ -26,7 +26,7 @@
       <div class="modal-content">
         <h2>당신의 투자 성향은...</h2>
         <div class="dog-result">
-          <img :src="`/dogs/types/type_${resultType}.png`" :alt="dogTypes[resultType]" />
+          <img :src="`/${resultType}.png`" :alt="dogTypes[resultType]" />
           <h3>{{ dogTypes[resultType] }}</h3>
           <p>{{ dogDescriptions[resultType] }}</p>
           <!-- RecommendationModal 컴포넌트 추가 -->
@@ -91,16 +91,29 @@ const questions = [
 ]
 
 const dogTypes = {
-  1: '바셋하운드', 2: '치와와', 3: '사모예드', 4: '코커스파니엘',
-  5: '웰시코기', 6: '푸들', 7: '비숑', 8: '포메라니안',
-  9: '닥스훈트', 10: '보더콜리', 11: '파피용', 12: '슈나우저',
-  13: '시츄', 14: '불독', 15: '비글', 16: '저먼셰퍼드'
+  1: '비숑', 2: '푸들', 3: '치와와', 4: '슈나우저',
+  5: '사모예드', 6: '바셋하운드', 7: '코커스파니엘', 8: '보더콜리',
+  9: '포메라니안', 10: '파피용', 11: '웰시코기', 12: '불독',
+  13: '비글', 14: '시츄', 15: '닥스훈트', 16: '저먼셰퍼드'
 }
 
 const dogDescriptions = {
-  1: '보수적이면서 안정적인 장기형',
-  2: '안전 선호하나 단기 수익 추구형',
-  // ... (다른 설명들)
+  1: '안정적이고 계획적인 저축형',
+  2: '안정적이고 자유로운 운용형',
+  3: '안정 추구, 즉흥적 운용형',
+  4: '안정적이고 적응형',
+  5: '장기적이며 자유로운 모험형',
+  6: '장기적이고 자유로운 운용형',
+  7: '장기적이며 상황 대응형',
+  8: '장기적이고 유연한 목표형',
+  9: '모험적이고 계획적인 저축형',
+  10: '모험적이고 자유로운 운용형',
+  11: '모험적이고 즉흥적 운용형',
+  12: '모험적이며 상황 대응형',
+  13: '고수익 장기 목표형',
+  14: '장기적이며 장로운 모험형',
+  15: '목표 지향적 장기 투자형',
+  16: '목표 지향적이고 장기적인 계획형',
 }
 
 const questionBox = reactive({
@@ -289,10 +302,44 @@ onUnmounted(() => {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: rgba(255, 255, 255, 0.9);
+  width: 70%; /* 가로 크기 */
+  /* max-width: 600px; 최대 가로 크기 */
+  max-height: calc(100vh - 300px); /* 창 높이를 벗어나지 않도록 제한 */
+  background: rgba(255, 255, 255, 0.95); /* 약간 투명한 흰색 배경 */
   padding: 20px;
-  border-radius: 10px;
-  text-align: center;
+  border-radius: 15px; /* 둥근 모서리 */
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* 부드러운 그림자 */
+  overflow-y: auto; /* 내용이 넘칠 경우 스크롤 추가 */
+}
+
+.result-modal {
+  z-index: 1000; /* 다른 요소들 위에 표시되도록 설정 */
+}
+
+.modal-header {
+  cursor: move; /* 드래그 가능하다는 것을 시각적으로 표시 */
+}
+
+button {
+  padding: 10px 20px;
+  background: #DDBEA9;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #C07A57;
+}
+
+.timer {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.answer {
+  font-size: 18px;
 }
 
 .question-modal {
@@ -328,37 +375,38 @@ onUnmounted(() => {
    border-radius: 10px;
    max-width: calc(100% -40px); /* 화면 크기에 맞게 조정 */
    max-height: calc(100% -40px); /* 화면 크기에 맞게 조정 */
-   overflow-y:auto; /* 내용이 넘칠 경우 스크롤 가능하게 설정 */
+   overflow-y: auto; /* 내용이 넘칠 경우 스크롤 가능하게 설정 */
 }
 
 .dog-result img {
-   width:200px; 
-   height:auto; 
-   object-fit:contain; 
+   width: 200px; 
+   height: auto; 
+   object-fit: contain; 
 }
 
 button {
-   padding:10px20px; 
-   background:#DDBEA9; 
-   border:none; 
-   border-radius:
-5px; 
-color:white; 
-cursor:pointer; 
-font-size:
-16px; 
-transition:
-background0.3s; 
+   padding: 10px 20px; 
+   background: #DDBEA9; 
+   border: none; 
+   border-radius: 5px; 
+   color: white; 
+   cursor: pointer; 
+   font-size: 16px; 
+   transition: background 0.3s; 
 }
 
 button:hover{
-background:#C07A57;}
+  background: #C07A57;
+}
 
-.timer{font-size:
-24px;font-weight:bold;margin-top:
-10px;}
+.timer {
+  font-size: 24px;
+  font-weight: bold;
+  margin-top: 10px;
+}
 
-.answer{font-size:
-18px;margin-top:
-10px;}
+.answer{
+  font-size: 18px;
+  margin-top: 10px;
+}
 </style>

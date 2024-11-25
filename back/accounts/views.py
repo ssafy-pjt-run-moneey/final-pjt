@@ -17,6 +17,8 @@ from articles.models import Article
 from rest_framework.views import APIView
 from django.contrib.auth import update_session_auth_hash
 
+User = get_user_model()
+
 @api_view(['POST'])
 def register(request):
     serializer = UserSerializer(data=request.data)
@@ -115,8 +117,12 @@ def update_dog_type(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def user_profile(request):
-    user = request.user
+def user_profile(request, user_id=None):
+    if user_id:
+        user = get_object_or_404(User, id=user_id)
+    else:
+        user = request.user
+
     data = {
         'id': user.id,
         'email': user.email,
@@ -124,6 +130,10 @@ def user_profile(request):
         'profile_img': request.build_absolute_uri(user.profile_img.url) if user.profile_img else None,
         'dog_type': user.dog_type,
         'created_date': user.created_date,
+        'followers': UserProfileSerializer(user.followers.all(), many=True, context={'request': request}).data,
+        'following': UserProfileSerializer(user.following.all(), many=True, context={'request': request}).data,
+        'followers_count': user.followers.count(),
+        'following_count': user.following.count(),
         'marked_products': ProductSerializer(
             Product.objects.filter(productmark__user=user),
             many=True
@@ -149,11 +159,28 @@ def update_profile(request):
 @permission_classes([IsAuthenticated])
 def toggle_follow(request, user_id):
     user_to_follow = get_object_or_404(User, id=user_id)
+    
+    # 자기 자신을 팔로우하는 것 방지
+    if request.user.id == user_id:
+        return Response({'error': '자기 자신을 팔로우할 수 없습니다.'}, status=400)
+
+    # 현재 사용자의 following 목록에서 대상 사용자를 확인
     if request.user.following.filter(id=user_id).exists():
+        # 언팔로우: 현재 사용자의 following에서 제거
         request.user.following.remove(user_to_follow)
-        return Response({'status': 'unfollowed'})
+        return Response({
+            'status': 'unfollowed',
+            'followers_count': user_to_follow.followers.count(),
+            'following_count': user_to_follow.following.count()
+        })
+    
+    # 팔로우: 현재 사용자의 following에 추가
     request.user.following.add(user_to_follow)
-    return Response({'status': 'followed'})
+    return Response({
+        'status': 'followed',
+        'followers_count': user_to_follow.followers.count(),
+        'following_count': user_to_follow.following.count()
+    })
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])

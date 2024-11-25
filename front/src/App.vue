@@ -15,11 +15,19 @@
           </template>
           
           <!-- 로그인한 경우 -->
-            <template v-else>
+          <template v-else>
+            <div class="user-profile">
+              <img 
+                :src="getProfileImage(userStore.userProfile?.profile_img)" 
+                :alt="userStore.userProfile?.username || '프로필'" 
+                class="profile-img"
+                @error="e => e.target.src = '/media/profiles/0.png'"
+              />
               <router-link to="/mypage" class="auth-link">마이페이지</router-link>
               <span class="divider">|</span>
               <button @click="handleLogout" class="logout-btn">로그아웃</button>
-            </template>
+            </div>
+          </template>
         </div>
       </div>
     </div>
@@ -57,10 +65,14 @@
 </template>
 
 <script setup>
+// script setup 부분
+import { ref, onMounted } from 'vue'
 import { RouterView, RouterLink } from 'vue-router'
 import { useCounterStore } from '@/stores/counter'
+import { useUserStore } from '@/stores/user'
 
 const store = useCounterStore()
+const userStore = useUserStore()
 
 const handleLogout = async () => {
   try {
@@ -77,6 +89,22 @@ const navLinks = [
   { path: '/map', text: '주변 은행' },
   { path: '/exchange', text: '환율 계산' }
 ]
+
+onMounted(async () => {
+  if (localStorage.getItem('token')) {
+    await userStore.fetchUserProfile()
+  }
+})
+
+const getProfileImage = (profileImgPath) => {
+  if (!profileImgPath || profileImgPath === "null") {
+    return "/media/profiles/0.png"
+  }
+  if (profileImgPath.startsWith('http')) {
+    return profileImgPath
+  }
+  return `http://localhost:8000${profileImgPath}`
+}
 </script>
 
 <style scoped>
@@ -228,6 +256,25 @@ const navLinks = [
   background-color: #FFF8F3;
   color: #706873;
   text-align: center;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.profile-img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.auth-links {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 

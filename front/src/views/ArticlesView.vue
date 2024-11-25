@@ -11,21 +11,17 @@
           </tr>
         </thead>
         <tbody>
-          <tr
-            v-for="article in articles"
-            :key="article.id"
-            @click="goToDetail(article.id)"
-            class="article-row"
-          >
-            <!-- 게시글 ID -->
+          <tr v-for="article in articles" :key="article.id" class="article-row">
             <td class="id-cell">{{ article.id }}</td>
+            
+            <!-- 제목에 클릭 이벤트 추가 -->
+            <td class="title-cell" @click="goToDetail(article.id)" style="cursor: pointer">
+              {{ article.title }}
+            </td>
 
-            <!-- 제목 -->
-            <td class="title-cell">{{ article.title }}</td>
-
-            <!-- 작성자 -->
+            <!-- 작성자에 클릭 이벤트 추가 -->
             <td class="author-cell">
-              <div class="author-wrapper">
+              <div class="author-wrapper" @click="goToProfile(article.user_id)" style="cursor: pointer">
                 <img
                   :src="getProfileImage(article.profile_img)"
                   alt="프로필 이미지"
@@ -35,7 +31,6 @@
               </div>
             </td>
 
-            <!-- 작성일 -->
             <td class="date-cell">{{ article.created_at.substring(0, 10) }}</td>
           </tr>
         </tbody>
@@ -78,6 +73,14 @@ export default {
     },
     goToDetail(articleId) {
       this.$router.push({ name: "DetailView", params: { id: articleId } });
+    },
+    goToProfile(userId) {
+      if (userId) {
+        this.$router.push({ 
+          name: 'MyPageView', 
+          params: { id: userId }
+        });
+      }
     },
     createArticle() {
       if (this.store.isLogin) {

@@ -3,16 +3,28 @@
     <!-- 프로필 섹션 -->
     <div class="profile-section">
       <div class="profile-header">
+        <!-- 왼쪽: 프로필 이미지 -->
         <div class="profile-image-container">
-          <!-- MyPageView.vue -->
-          <img :src="userProfile.profile_img || '/profiles/0.png'" @click="showRecommendationModal = true" class="profile-image" alt="프로필 이미지" />
-          <RecommendationModal v-if="showRecommendationModal" @close="showRecommendationModal = false" />
+          <img 
+            :src="userProfile.profile_img || '/profiles/0.png'" 
+            @click="showRecommendationModal = true"
+            class="profile-image" 
+            alt="프로필 이미지"
+          />
         </div>
+
+        <!-- 중앙: 유저 정보 -->
         <div class="profile-info">
           <h2>{{ userProfile.username }}</h2>
-          <p class="user-email">이메일 : {{ userProfile.email }}</p>
-          <p class="dog-type">강아지 유형 : {{ getDogType(userProfile.dog_type)?.name || '알 수 없음' }}</p>
-          <p class="join-date">가입일 : {{ formatDate(userProfile.created_date) }}</p>
+          <div class="user-info-group">
+            <p class="user-email">이메일: {{ userProfile.email }}</p>
+            <p class="dog-type">강아지 유형: {{ getDogType(userProfile.dog_type)?.name || '알 수 없음' }}</p>
+            <p class="join-date">가입일: {{ formatDate(userProfile.created_date) }}</p>
+          </div>
+        </div>
+
+        <!-- 오른쪽: 팔로우 정보와 버튼 -->
+        <div class="profile-stats">
           <div class="follow-stats">
             <span @click="showFollowModal('followers')" class="follow-count">
               팔로워 {{ userProfile.followers_count }}
@@ -24,14 +36,14 @@
           <div class="profile-actions">
             <button 
               v-if="isOwnProfile" 
-              @click="editProfile"
+              @click="editProfile" 
               class="profile-button edit-button"
             >
               프로필 수정
             </button>
             <button 
               v-else 
-              @click="toggleFollow"
+              @click="toggleFollow" 
               class="profile-button follow-button"
               :class="{ 'following': isFollowing }"
             >
@@ -50,14 +62,13 @@
           <div v-for="user in modalUsers" :key="user.id" class="follow-item">
             <img :src="user.profile_img" class="follow-avatar" />
             <span class="follow-username">{{ user.username }}</span>
-            <div class="follow-status">
-              <span v-if="isFollowingEachOther(user)" class="mutual-follow">맞팔로우</span>
+            <div class="follow-status" v-if="user.id !== userStore.currentUser?.id">
               <button 
-                v-else-if="!isFollowingUser(user)"
-                @click="followUser(user.id)"
+                @click="followUser(user.id)" 
                 class="follow-button"
+                :class="{ 'following': isFollowingUser(user) }"
               >
-                팔로우
+                {{ isFollowingUser(user) ? '언팔로우' : '팔로우' }}
               </button>
             </div>
           </div>
@@ -323,29 +334,52 @@ const getDogType = (type) => {
 }
 
 // 팔로우 모달 관련 함수들 추가
+const showFollowButton = (user) => {
+  return !isOwnProfile.value && // 자신의 프로필이 아닐 때
+         user.id !== userStore.currentUser?.id && // 자기 자신이 아닐 때
+         !isFollowingUser(user) // 아직 팔로우하지 않은 경우
+}
+
+// MyPageView.vue의 script 부분
 const showFollowModal = (type) => {
-  modalType.value = type
-  modalUsers.value = type === 'followers' ? userProfile.value.followers : userProfile.value.following
-  showFollowModalState.value = true  // 변수명 변경
+  try {
+    modalType.value = type
+    // 팔로워/팔로잉 목록 설정
+    if (userProfile.value) {
+      modalUsers.value = type === 'followers' 
+        ? userProfile.value.followers 
+        : userProfile.value.following
+    }
+    showFollowModalState.value = true
+  } catch (error) {
+    console.error('모달 표시 실패:', error)
+  }
 }
 
 const closeFollowModal = () => {
-  showFollowModalState.value = false  // 변수명 변경
+  showFollowModalState.value = false
+  modalUsers.value = []
+}
+
+// 팔로우 상태 확인 함수 수정
+const isFollowingUser = (user) => {
+  if (!userStore.currentUser || !userProfile.value) return false
+  return userStore.currentUser.following?.some(following => following.id === user.id)
 }
 
 const isFollowingEachOther = (user) => {
-  return user.followers?.includes(userStore.currentUser?.id) && 
-         user.following?.includes(userStore.currentUser?.id)
-}
-
-const isFollowingUser = (user) => {
-  return user.followers?.includes(userStore.currentUser?.id)
+  return isFollowingUser(user) && user.following?.includes(userStore.currentUser?.id)
 }
 
 const followUser = async (userId) => {
   try {
     await userStore.toggleFollow(userId)
+    // 팔로우 상태 변경 후 모달 내용 업데이트
     await fetchUserProfile()
+    // 모달 내용 업데이트
+    modalUsers.value = modalType.value === 'followers' 
+      ? userProfile.value.followers 
+      : userProfile.value.following
   } catch (error) {
     console.error('팔로우 처리 실패:', error)
   }
@@ -440,10 +474,15 @@ const fetchUserProfile = async () => {
       router.push('/login')
       return
     }
-    const response = await api.get('/accounts/profile/', {
-      headers: {
-        Authorization: `Token ${token}`
-      }
+
+    // URL에서 id 파라미터 확인
+    const userId = route.params.id
+    const endpoint = userId 
+      ? `/accounts/profile/${userId}/`  // 특정 사용자의 프로필
+      : '/accounts/profile/'            // 현재 로그인한 사용자의 프로필
+
+    const response = await api.get(endpoint, {
+      headers: { Authorization: `Token ${token}` }
     })
     userProfile.value = response.data
   } catch (error) {
@@ -477,37 +516,43 @@ onMounted(async () => {
 
 <style scoped>
 .mypage-container {
-  max-width: 1200px;
+  max-width: 1000px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 2rem 4rem;
 }
 
 .profile-section {
   background: white;
   border-radius: 15px;
-  padding: 2rem;
+  padding: 1.5rem 10rem;  /* 위아래 1.5rem, 좌우 4rem으로 수정 */
   margin-bottom: 2rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-width: 1200px;  /* 최대 너비 설정 */
+  /* margin: 0 auto;  */
 }
 
 .profile-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 2rem;
+  display: grid;
+  grid-template-columns: 150px 1fr 200px;  /* 컬럼 너비 명확히 지정 */
+  gap: 3rem;  /* 간격 늘림 */
+  align-items: center;
+  min-height: 120px;  /* 높이 줄임 */
 }
 
 .profile-image-container {
-  flex-shrink: 0;
+  display: flex;
+  justify-content: center;  /* 이미지 중앙 정렬 */
+  width: 150px;
 }
 
 .profile-image {
-  width: 150px;
-  height: 150px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   object-fit: cover;
+  border: 3px solid #DDBEA9;
   cursor: pointer;
   transition: transform 0.2s;
-  border: 3px solid #DDBEA9;
 }
 
 .profile-image:hover {
@@ -515,22 +560,24 @@ onMounted(async () => {
 }
 
 .profile-info {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  padding: 0 1.5rem;  /* 패딩 증가 */
+}
+
+.user-info-group {
+  margin-top: 0.5rem;  /* 상단 여백 추가 */
+  line-height: 1.6;  /* 줄 간격 증가 */
 }
 
 .user-email,.dog-type, .join-date {
   color: #666;
-  font-size: 0.9rem;
-  margin: 0;
+  font-size: 1rem;
+  margin: 0.3rem 0;
 }
 
 .profile-info h2 {
-  margin: 0;
   color: #47413b;
-  font-size: 1.8rem;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
 }
 
 
@@ -598,10 +645,18 @@ onMounted(async () => {
   margin: 1rem 0;
 }
 
+.profile-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: center;  /* 중앙 정렬 */
+  justify-content: center;
+  gap: 1rem;
+}
+
 .follow-stats {
   display: flex;
-  gap: 1.5rem;
-  margin-top: 0.5rem;
+  gap: 2rem;  /* 팔로워/팔로잉 간격 증가 */
+  font-size: 1.1rem;  /* 글자 크기 증가 */
 }
 
 .follow-count {
@@ -688,6 +743,7 @@ onMounted(async () => {
   background: white;
   border-radius: 15px;
   padding: 1.5rem;
+  margin-top: 2rem;
   margin-bottom: 2rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   max-height: 350px;  /* 고정 높이 설정 */
@@ -773,6 +829,11 @@ onMounted(async () => {
 .dog-personality, .dog-finance {
   margin: 0.5rem 0;
   color: #666;
+}
+
+.profile-actions {
+  margin-top: 1rem;
+  text-align: center;  /* 버튼 중앙 정렬 */
 }
 
 .profile-actions button {
