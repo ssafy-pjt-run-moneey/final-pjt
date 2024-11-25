@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import api from '@/api'
+import router from '@/router'
 
 export const useUserStore = defineStore('user', () => {
   const currentUser = ref(null)
@@ -10,6 +11,7 @@ export const useUserStore = defineStore('user', () => {
 
   const setCurrentUser = (user) => {
     currentUser.value = user
+    console.log('Current user set:', currentUser.value)  // 디버깅용
   }
 
   const fetchUserProfile = async () => {
@@ -19,37 +21,71 @@ export const useUserStore = defineStore('user', () => {
         router.push('/login')
         return
       }
-
+  
       const response = await api.get('/accounts/profile/', {
         headers: { Authorization: `Token ${token}` }
       })
       
       userProfile.value = response.data
-      setCurrentUser(response.data)
+      setCurrentUser(response.data)  // 현재 사용자 정보 설정
       
       // 팔로워/팔로잉 상태 업데이트
       followers.value = response.data.followers || []
       followings.value = response.data.following || []
       
+      console.log('프로필 정보 로드됨:', response.data)
+      console.log('현재 사용자 설정됨:', currentUser.value)
+      
+      return response.data
     } catch (error) {
       console.error('프로필 조회 실패:', error)
+      throw error  // 에러를 던져서 호출한 곳에서 처리할 수 있게 함
     }
+  }
+
+  const login = async (credentials) => {
+    try {
+      const response = await api.post('/accounts/login/', credentials)
+      const token = response.data.token
+      localStorage.setItem('token', token)
+      await fetchUserProfile()  // 로그인 성공 후 바로 프로필 정보 가져오기
+      return response.data
+    } catch (error) {
+      console.error('로그인 실패:', error)
+      throw error
+    }
+  }
+
+  const logout = () => {
+    localStorage.removeItem('token')
+    currentUser.value = null
+    userProfile.value = null
+    followers.value = []
+    followings.value = []
+    router.push('/login')
   }
 
   const updateProfile = async (data) => {
     try {
-      const response = await api.put('/accounts/profile/update/', data)
+      const token = localStorage.getItem('token')
+      const response = await api.put('/accounts/profile/update/', data, {
+        headers: { Authorization: `Token ${token}` }
+      })
+      await fetchUserProfile()  // 프로필 업데이트 후 정보 새로고침
       return response.data
     } catch (error) {
       console.error('프로필 수정 실패:', error)
       throw error
     }
   }
-
+  
   const toggleFollow = async (userId) => {
     try {
-      const response = await api.post(`/accounts/follow/${userId}/`)
-      await fetchUserProfile()  // 팔로우 상태 업데이트를 위해 프로필 새로고침
+      const token = localStorage.getItem('token')
+      const response = await api.post(`/accounts/follow/${userId}/`, {}, {
+        headers: { Authorization: `Token ${token}` }
+      })
+      await fetchUserProfile()
       return response.data
     } catch (error) {
       console.error('팔로우 처리 실패:', error)
@@ -79,6 +115,8 @@ export const useUserStore = defineStore('user', () => {
     fetchUserProfile,
     updateProfile,
     toggleFollow,
-    deleteAccount
+    deleteAccount,
+    login,
+    logout
   }
 })

@@ -13,6 +13,7 @@ import MapView from '@/views/MapView.vue'
 import ExchangeView from '@/views/ExchangeView.vue'
 import { useCounterStore } from '@/stores/counter'
 import ProductDetailView from '@/views/ProductDetailView.vue' 
+import ProfileEditView from '@/views/ProfileEditView.vue' 
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -29,7 +30,7 @@ const router = createRouter({
     },
     {
       path: '/mypage',
-      name: 'MyPageView',
+      name: 'MyPageView',  // 이 이름이 router-link의 name과 일치해야 함
       component: MyPageView,
       meta: { requiresAuth: true },
       beforeEnter: (to, from, next) => {
@@ -40,6 +41,12 @@ const router = createRouter({
           next()
         }
       }
+    },
+    {
+      path: '/profile/edit',
+      name: 'ProfileEditView',
+      component: ProfileEditView,
+      meta: { requiresAuth: true },  // 인증 필요
     },
     {
       path: '/login',

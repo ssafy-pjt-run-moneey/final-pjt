@@ -14,14 +14,14 @@ from pathlib import Path
 from datetime import timedelta
 
 import os
-from dotenv import load_dotenv
 
-load_dotenv()
+from decouple import config
 
-FSS_API_KEY = os.getenv('FSS_API_KEY')
+OPENAI_API_KEY = config('OPENAI_API_KEY')
+FSS_API_KEY = config('FSS_API_KEY', default=None)
+
 if not FSS_API_KEY:
     raise ValueError("FSS_API_KEY is not set")
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 

@@ -14,6 +14,8 @@ from products.serializers import ProductSerializer
 from django.shortcuts import get_object_or_404
 from articles.serializers import ArticleSerializer
 from articles.models import Article
+from rest_framework.views import APIView
+from django.contrib.auth import update_session_auth_hash
 
 @api_view(['POST'])
 def register(request):
@@ -158,3 +160,27 @@ def toggle_follow(request, user_id):
 def delete_account(request):
     request.user.delete()
     return Response({'message': '계정이 삭제되었습니다.'})
+
+class PasswordChangeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        old_password = request.data.get('old_password')
+        new_password1 = request.data.get('new_password1')
+        new_password2 = request.data.get('new_password2')
+
+        if not user.check_password(old_password):
+            return Response({'error': '현재 비밀번호가 일치하지 않습니다.'}, 
+                          status=status.HTTP_400_BAD_REQUEST)
+
+        if new_password1 != new_password2:
+            return Response({'error': '새 비밀번호가 일치하지 않습니다.'}, 
+                          status=status.HTTP_400_BAD_REQUEST)
+
+        user.set_password(new_password1)
+        user.save()
+        update_session_auth_hash(request, user)  # 세션 유지
+        
+        return Response({'message': '비밀번호가 성공적으로 변경되었습니다.'}, 
+                      status=status.HTTP_200_OK)

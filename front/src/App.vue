@@ -15,11 +15,11 @@
           </template>
           
           <!-- 로그인한 경우 -->
-          <template v-else>
-            <RouterLink :to="{ name: 'MyPageView' }" class="auth-link">마이페이지</RouterLink>
-            <span class="divider">|</span>
-            <button @click="handleLogout" class="logout-btn">로그아웃</button>
-          </template>
+            <template v-else>
+              <router-link to="/mypage" class="auth-link">마이페이지</router-link>
+              <span class="divider">|</span>
+              <button @click="handleLogout" class="logout-btn">로그아웃</button>
+            </template>
         </div>
       </div>
     </div>
@@ -187,6 +187,19 @@ const navLinks = [
   opacity: 0;
   transition: opacity 0.3s ease;
   z-index: 1;
+}
+
+.logout-btn {
+  background: none;
+  border: none;
+  color: #333;
+  font-size: 14px;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.logout-btn:hover {
+  color: #C07A57;
 }
 
 .router-link-active {

@@ -12,7 +12,9 @@ class Article(models.Model):
 
 class Comment(models.Model):
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=1)  # 기본값 추가
-    content = models.CharField(max_length=200)
+    user = models.ForeignKey('accounts.User', on_delete=models.CASCADE)
+    content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    profile_img = models.ImageField(upload_to='profiles/', blank=True, null=True)  # 프로필 이미지 필드 추가
+    username = models.CharField(max_length=50, blank=True, null=True)  # 사용자 이름 필드 추가
