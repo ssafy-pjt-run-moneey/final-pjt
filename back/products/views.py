@@ -246,128 +246,63 @@ def recommendations(request):
     # 기본 쿼리셋 가져오기
     products = Product.objects.prefetch_related('options')
 
-    # 각 dog_type에 따른 조건 설정
+    # 각 dog_type에 따른 조건 설정 (조건 완화)
     if user_type == 1:  # 비숑 (XXXX)
         personalized_products = products.filter(
-            options__save_trm__lte=6,  # 6개월 이하 단기 상품
+            options__save_trm__lte=12,  # 12개월 이하 단기 상품으로 확장
             product_type='deposit'
         ).distinct()[:4]
 
     elif user_type == 2:  # 푸들 (XXXO)
         personalized_products = products.filter(
-            product_type='savings',  # 적금 상품
-            options__intr_rate__gt=0  # 금리가 0보다 큰 상품
+            product_type='savings'  # 금리 조건 제거
         ).distinct()[:4]
 
     elif user_type == 3:  # 치와와 (XXOX)
         personalized_products = products.filter(
             product_type='deposit',
-            options__save_trm__lte=3,  # 3개월 이하 단기 상품
-            options__intr_rate__gt=0
+            options__save_trm__lte=6  # 기간을 6개월 이하로 완화
         ).distinct()[:4]
 
     elif user_type == 4:  # 슈나우저 (XXOO)
         personalized_products = products.filter(
             product_type='savings',
-            options__save_trm__lte=12,  # 1년 이하 상품
-            options__intr_rate__gt=0
+            options__save_trm__lte=24  # 기간을 최대 2년으로 확장
         ).distinct()[:4]
 
-    elif user_type == 5:  # 사모예드 (XOXX)
+    elif user_type in [5, 7, 8, 13, 15]:  # 사모예드, 코커스파니엘, 보더콜리 등
         filtered_products = []
         for product in products.filter(product_type='savings'):
             for option in product.options.all():
-                if option.save_trm >= 24 and option.intr_rate2 > option.intr_rate:
+                if option.save_trm >= 12:  # 최소 기간 조건만 유지
                     filtered_products.append(product)
                     break
         personalized_products = filtered_products[:4]
 
-    elif user_type == 6:  # 바셋하운드 (XOXO)
+    elif user_type in [6, 9, 11, 12]:  # 바셋하운드, 포메라니안 등
         filtered_products = []
         for product in products.filter(product_type='deposit'):
             for option in product.options.all():
-                if option.save_trm >= 12 and option.intr_rate > 0:
+                if option.save_trm >= 6:  # 최소 기간 조건만 유지
                     filtered_products.append(product)
                     break
         personalized_products = filtered_products[:4]
 
-    elif user_type == 7:  # 코커스파니엘 (XOOX)
-        filtered_products = []
-        for product in products.filter(product_type='savings'):
-            for option in product.options.all():
-                if option.save_trm >= 36 and option.intr_rate2 > option.intr_rate:
-                    filtered_products.append(product)
-                    break
-        personalized_products = filtered_products[:4]
-
-    elif user_type == 8:  # 보더콜리 (XOOO)
-        filtered_products = []
-        for product in products.filter(product_type='savings'):
-            for option in product.options.all():
-                if option.save_trm >= 60 and "목표" in product.spcl_cnd:
-                    filtered_products.append(product)
-                    break
-        personalized_products = filtered_products[:4]
-
-    elif user_type == 9:  # 포메라니안 (OXXX)
-        filtered_products = []
-        for product in products.filter(product_type='deposit'):
-            for option in product.options.all():
-                if option.save_trm <= 6 and option.intr_rate2 > option.intr_rate:
-                    filtered_products.append(product)
-                    break
-        personalized_products = filtered_products[:4]
-
-    elif user_type == 10:  # 파피용 (OXXO)
-        filtered_products = []
-        for product in products.filter(product_type='savings'):
-            if "자유" in product.spcl_cnd:
-                filtered_products.append(product)
-                break
-        personalized_products = filtered_products[:4]
-
-    elif user_type == 11:  # 웰시코기 (OXOX)
+    elif user_type in [10, 14]:  # 파피용, 시츄 등
         personalized_products = products.filter(
-            product_type='deposit',
-            spcl_cnd__icontains="입출금 자유"  # 입출금 자유로운 상품
+            product_type='savings'
         ).distinct()[:4]
-
-    elif user_type == 12:  # 불독 (OXOO)
-        personalized_products = products.filter(
-            product_type='deposit',
-            spcl_cnd__icontains="변동 금리"  # 변동 금리 혜택이 있는 상품
-        ).distinct()[:4]
-
-    elif user_type == 13:  # 비글 (OOXX)
-        filtered_products = []
-        for product in products.filter(product_type='savings'):
-            for option in product.options.all():
-                if option.save_trm >= 60 and "목표" in product.spcl_cnd:
-                    filtered_products.append(product)
-                    break
-        personalized_products = filtered_products[:4]
-
-    elif user_type == 14:  # 시츄 (OOXO)
-        filtered_products = []
-        for product in products.filter(product_type='savings'):
-            if "자유 납입 가능" in product.spcl_cnd:
-                filtered_products.append(product)
-                break
-        personalized_products = filtered_products[:4]
-
-    elif user_type == 15:  # 닥스훈트 (OOOX)
-        filtered_products = []
-        for product in products.filter(product_type='savings'):
-            if "목표 설정 가능" in product.spcl_cnd:
-                filtered_products.append(product)
-                break
-        personalized_products = filtered_products[:4]
 
     elif user_type == 16:  # 저먼셰퍼드 (OOOO)
         personalized_products = products.filter(
-            product_type='deposit',
-            spcl_cnd__icontains="장기 수익률 보증"
+            product_type='deposit'
         ).distinct()[:4]
+
+    # 추천 상품이 없을 경우 기본 상품 제공
+    if not personalized_products:
+        fallback_product = products.filter(product_type='deposit').first()
+        if fallback_product:
+            personalized_products = [fallback_product]
 
     # 비슷한 사람들이 많이 마킹한 상품 찾기
     similar_users = request.user.__class__.objects.filter(dog_type=user_type)  

@@ -24,7 +24,6 @@
     <!-- 결과 모달을 game-container 밖으로 이동 -->
     <div v-if="showResult" class="result-modal">
       <div class="modal-content">
-        <button class="close-button" @click="closeResult">×</button>
         <h2>당신의 투자 성향은...</h2>
         <div class="dog-result">
           <img :src="`/${resultType}.png`" :alt="dogTypes[resultType]" />
@@ -34,7 +33,10 @@
           <!-- RecommendationModal 컴포넌트 추가 -->
           <RecommendationModal v-if="showResult" @close="showResult = false" />
         </div>
-        <button @click="restartGame" class="again">다시하기</button>
+        <div class="button-container">
+          <button @click="restartGame" class="again">다시하기</button>
+          <button class="close" @click="closeResult">창 닫기</button>
+        </div>
       </div>
     </div>
   </div>
@@ -379,6 +381,9 @@ button:hover {
 }
 
 .result-modal .modal-content {
+  /* display: flex; */
+  flex-direction: column;
+  align-items: center;
    background-color: white;
    padding: 20px;
    border-radius: 10px;
@@ -386,7 +391,22 @@ button:hover {
    max-height: calc(100% -40px); /* 화면 크기에 맞게 조정 */
    overflow-y: auto; /* 내용이 넘칠 경우 스크롤 가능하게 설정 */
 }
+.result-modal .again,
+.result-modal .close {
+  display: inline-block;
+  margin: 0 1px; /* 버튼 사이 간격 */
+  margin-top: 30px;
+}
 
+.result-modal .button-container {
+  display: flex;
+  justify-content: center; /* 가운데 정렬 */
+  gap: 20px; /* 버튼 간격 */
+}
+
+.close:hover {
+  background: #B7B7A4; /* hover 색상 변경 */
+}
 .dog-result img {
    width: 200px; 
    height: auto; 
@@ -427,18 +447,24 @@ button:hover{
   position: relative;
 } */
 
-.close-button {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 24px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #333;
+.close {
+  padding: 10px 20px; 
+  background: #A5A58D; 
+  border: none; 
+  border-radius: 5px; 
+  color: white; 
+  cursor: pointer; 
+  font-size: 16px; 
+  transition: background 0.3s; 
 }
 
-.close-button:hover {
-  color: #000;
+.result-modal .button-container {
+  display: flex;
+  justify-content: center; /* 가운데 정렬 */
+  gap: 20px; /* 버튼 간격 */
+}
+
+.close:hover {
+  background: #B7B7A4; /* hover 색상 변경 */
 }
 </style>

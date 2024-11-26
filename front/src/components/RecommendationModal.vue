@@ -43,7 +43,7 @@
 
     <!-- 비슷한 사람들이 많이 마킹한 상품 -->
     <div class="recommendation-section">
-      <h2>이 강아지가 많이 마킹한 상품</h2>
+      <h2 class="thisdog">이 강아지가 많이 마킹한 상품</h2>
       <div v-if="popularProducts.length" class="products-grid">
         <div v-for="product in popularProducts" :key="product.fin_prdt_cd" class="product-card">
           <div class="card-header">
@@ -130,6 +130,11 @@ onMounted(fetchRecommendations)
 </script>
 
 <style scoped>
+.recommendation-container {
+  margin: 15%;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
 .products-container {
   max-width: 1200px;
   margin: 0 auto;
@@ -273,5 +278,9 @@ onMounted(fetchRecommendations)
 
 .detail-button:hover {
   background: #B7B7A4;
+}
+
+.thisdog {
+  margin-top: 50px;
 }
 </style>
