@@ -1,6 +1,6 @@
 # 달려라 멍니 (Run, Monney)
 
-![RunMonney](https://github.com/ssafy-pjt-run-moneey/final-pjt/blob/main/image/RunMonney.png)
+![RunMonney](https://github.com/ssafy-pjt-run-moneey/final-pjt/blob/main/image/Runmonney.png)
 ---
 
 ### 📋 프로젝트 개요
