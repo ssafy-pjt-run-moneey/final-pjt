@@ -708,6 +708,150 @@ onMounted(async () => {
   overflow-y: auto;
 }
 
+.articles-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.articles-table th,
+.articles-table td {
+  padding: 0.8rem;
+  text-align: left;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.articles-table th {
+  background: #faf6f1;
+  color: #47413b;
+  font-weight: 600;
+}
+
+.article-title {
+  color: #47413b;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.article-title:hover {
+  color: #DDBEA9;
+}
+
+.marked-products {
+  background: white;
+  border-radius: 15px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-height: 350px;  /* 고정 높이 설정 */
+  overflow-y: auto;   /* 세로 스크롤 추가 */
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.product-item {
+  background: #faf6f1;  /* 카드 배경색 변경 */
+  padding: 1rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.product-info h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  color: #47413b;
+}
+
+.bank-name {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.product-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.unmark-button {
+  background: #c77e7e;  /* 마킹 취소 버튼 색상 */
+  padding: 0.4rem 0.8rem;
+  border: none;  /* 테두리 제거 */
+  border-radius: 5px;  /* 모서리 둥글게 */
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.3s ease;
+  color: white;
+}
+
+.detail-button {
+  background: #DDBEA9;  /* 상세보기 버튼 색상 */
+  padding: 0.4rem 0.8rem;
+  border: none;  /* 테두리 제거 */
+  border-radius: 5px;  /* 모서리 둥글게 */
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.3s ease;
+  color: white;
+}
+
+.unmark-button:hover {
+  background: #b76e6e;
+}
+
+.detail-button:hover {
+  background: #CB997E;
+}
+
+.rates-chart {
+  margin-top: 2rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 10px;
+  height: 400px;
+}
+
+.rates-chart h3 {
+  margin-bottom: 1rem;
+  color: #47413b;
+}
+
+.dog-personality, .dog-finance {
+  margin: 0.5rem 0;
+  color: #666;
+}
+
+.profile-actions button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background: #DDBEA9;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.profile-actions button:hover {
+  background: #CB997E;
+}
+
+.delete-account {
+  margin-top: 2rem;
+  padding: 0.5rem 1rem;
+  background: #c77e7e;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
 .marked-products {
   background: white;
   border-radius: 15px;
