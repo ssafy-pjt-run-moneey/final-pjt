@@ -31,7 +31,7 @@
           <h3>{{ dogDescriptions[resultType] }}</h3>
           <h1>👇</h1>
           <!-- RecommendationModal 컴포넌트 추가 -->
-          <RecommendationModal v-if="showResult" @close="showResult = false" />
+          <RecommendationModal v-if="showResult" @close="showResult = false" :username="userProfile.username"/>
         </div>
         <div class="button-container">
           <button @click="restartGame" class="again">다시하기</button>
@@ -46,6 +46,8 @@
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import { useCounterStore } from '@/stores/counter'
 import RecommendationModal from '@/components/RecommendationModal.vue'
+import api from '@/api'; // API 호출을 위한 모듈
+
 const store = useCounterStore()
 
 const gameStarted = ref(false)
@@ -57,6 +59,7 @@ const resultType = ref(null)
 const timer = ref(5)
 const currentAnswer = ref('X')
 const timerInterval = ref(null)
+const userProfile = ref(null); // 사용자 프로필 정보
 
 const gameState = reactive({
   dog: {
@@ -259,6 +262,25 @@ const restartGame = () => {
   gameState.dog.velocityY = 0
   gameState.dog.isJumping = false
 }
+// 사용자 프로필 정보 가져오기
+const fetchUserProfile = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await api.get('/accounts/profile/', {
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    });
+    userProfile.value = response.data;
+  } catch (error) {
+    console.error('프로필 정보 로드 실패:', error);
+  }
+};
+
+// 컴포넌트 마운트 시 사용자 정보 가져오기
+onMounted(() => {
+  fetchUserProfile();
+});
 
 onMounted(() => {
   window.addEventListener('keydown', handleKeyPress)

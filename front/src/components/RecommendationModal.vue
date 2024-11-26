@@ -2,7 +2,7 @@
   <div class="recommendation-container">
     <!-- 당신에게 맞는 상품 -->
     <div class="recommendation-section">
-      <h2>당신에게 추천하는 상품</h2>
+      <h2>{{ username }}님에게 추천하는 상품</h2>
       <div v-if="personalizedProducts.length" class="products-grid">
         <div v-for="product in personalizedProducts" :key="product.fin_prdt_cd" class="product-card">
           <div class="card-header">
@@ -87,6 +87,14 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import api from '@/api'
+
+// Props로 username을 받아옴
+const props = defineProps({
+  username: {
+    type: String,
+    required: true,
+  },
+});
 
 const personalizedProducts = ref([])
 const popularProducts = ref([])

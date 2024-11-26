@@ -265,8 +265,8 @@ const getProfileImage = (profileImgPath) => {
 }
 
 .profile-img {
-  width: 30px;
-  height: 30px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   object-fit: cover;
 }

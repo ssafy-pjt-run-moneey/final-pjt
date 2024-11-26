@@ -23,10 +23,12 @@
               <!-- 강아지 유형 이미지 및 설명 표시 -->
               <img :src="`/${userProfile.dog_type}.png`" :alt="getDogType(userProfile.dog_type)?.name" />
               <h1>{{ getDogType(userProfile.dog_type)?.name }}</h1>
-              <h3>{{ getDogType(userProfile.dog_type)?.personality }}</h3>
+              <!-- <h3>{{ getDogType(userProfile.dog_type)?.personality }}</h3> -->
               <h3>{{ getDogType(userProfile.dog_type)?.finance }}</h3>
+              <h1>👇</h1>
+              <!-- RecommendationModal 컴포넌트 추가 -->
+              <RecommendationModal v-if="showResult" @close="showResult = false" :username="userProfile.username" />
             </div>
-
             <!-- 닫기 버튼 -->
             <button @click="showResultModal = false" class="close">닫기</button>
           </div>
@@ -186,10 +188,10 @@
       회원 탈퇴
     </button>
 
-    <!-- RecommendationModal 추가 -->
+    <!-- RecommendationModal 추가
     <RecommendationModal v-if="showRecommendationModal" 
                           @close="showRecommendationModal = false" 
-                          :dogType="userProfile.dog_type" />
+                          :dogType="userProfile.dog_type" /> -->
   </div>
 </template>
 
@@ -281,7 +283,8 @@ const toggleFollow = async () => {
   }
 }
 
-const showResultModal = ref(false);
+const showResultModal = ref(false); // 결과 모달 표시 여부
+const showResult = ref(true); // RecommendationModal 표시 여부
 const getDogType = (type) => {
   // 강아지 유형에 따른 설명 반환
   const types = {
@@ -898,25 +901,62 @@ onMounted(async () => {
 /* 결과 모달 스타일 */
 .result-modal {
   position: fixed;
-  top: 0;
+  top: 0; /* 화면 상단부터 시작 */
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: center; /* 가로 가운데 정렬 */
+  align-items: center; /* 세로 가운데 정렬 */
+  z-index: 1000; /* 다른 요소 위에 표시 */
 }
 
 .modal-content {
   background-color: white;
   padding: 20px;
-  border-radius: 10px;
-  text-align:center;
+  border-radius: 15px;
+  max-width: 60%; /* 최대 가로 크기 */
+  max-height: calc(100vh - 300px); /* 창 높이를 벗어나지 않도록 제한 */
+  background: rgba(255, 255, 255, 0.95); /* 약간 투명한 흰색 배경 */
+  overflow-y: auto; /* 내용이 넘칠 경우 스크롤 추가 */
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* 부드러운 그림자 */
+  z-index: 1000; /* 다른 요소들 위에 표시되도록 설정 */
+}
+
+.dog-result {
+  text-align: center;
 }
 
 .dog-result img {
-  width:auto; height:auto; max-height:auto;
+  width: auto;
+  height: auto;
+  max-height: 200px; /* 강아지 이미지 최대 높이 설정 */
+}
+
+h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+h1 {
+  font-size: 22px;
+}
+
+h3 {
+  font-size: 18px;
+}
+
+.close {
+  padding: 10px 20px; 
+  background: #A5A58D; 
+  border: none; 
+  border-radius: 5px; 
+  color: white; 
+  cursor: pointer; 
+  font-size: 16px; 
+  transition: background 0.3s; 
+  margin: 20px;
 }
 
 .close:hover{
