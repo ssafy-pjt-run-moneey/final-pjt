@@ -3,12 +3,33 @@
     <!-- 프로필 섹션 -->
     <div class="profile-section">
       <div class="profile-header">
+        
         <!-- 왼쪽: 프로필 이미지 -->
         <div class="profile-image-container">
-          <img :src="userProfile.profile_img || '/profiles/0.png'" 
-              @click="showRecommendationModal = true" 
-              class="profile-image" 
-              alt="프로필 이미지" />
+          <!-- 클릭 시 결과 모달 표시 -->
+          <img
+            :src="userProfile.profile_img || '/profiles/0.png'"
+            @click="showResultModal = true"
+            class="profile-image"
+            alt="프로필 이미지"
+          />
+        </div>
+
+        <!-- 결과 모달 -->
+        <div v-if="showResultModal" class="result-modal">
+          <div class="modal-content">
+            <h2>당신의 투자 성향은...</h2>
+            <div class="dog-result">
+              <!-- 강아지 유형 이미지 및 설명 표시 -->
+              <img :src="`/${userProfile.dog_type}.png`" :alt="getDogType(userProfile.dog_type)?.name" />
+              <h1>{{ getDogType(userProfile.dog_type)?.name }}</h1>
+              <h3>{{ getDogType(userProfile.dog_type)?.personality }}</h3>
+              <h3>{{ getDogType(userProfile.dog_type)?.finance }}</h3>
+            </div>
+
+            <!-- 닫기 버튼 -->
+            <button @click="showResultModal = false" class="close">닫기</button>
+          </div>
         </div>
 
         <!-- 중앙: 유저 정보 -->
@@ -260,6 +281,7 @@ const toggleFollow = async () => {
   }
 }
 
+const showResultModal = ref(false);
 const getDogType = (type) => {
   // 강아지 유형에 따른 설명 반환
   const types = {
@@ -872,4 +894,33 @@ onMounted(async () => {
   border-radius: 5px;
   cursor: pointer;
 }
+
+/* 결과 모달 스타일 */
+.result-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align:center;
+}
+
+.dog-result img {
+  width:auto; height:auto; max-height:auto;
+}
+
+.close:hover{
+  background:#B7B7A4;
+}
+
 </style>

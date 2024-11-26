@@ -198,7 +198,7 @@ const getProfileImage = (profileImgPath) => {
   font-weight: 700;
   font-size: 17px;
   transition: color 0.3s ease;
-  z-index: 3;
+  z-index: 0;
   padding: 5px 10px;
   line-height: 1; /* Add this to maintain consistent text height */
 }
