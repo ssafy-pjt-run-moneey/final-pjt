@@ -1,6 +1,6 @@
 # 달려라 멍니 (Run, Monney)
 
-![RunMonney](https://github.com/ssafy-pjt-run-moneey/final-pjt/blob/main/image/Runmonney.png)
+![달려라멍니](image/Runmonney.png)
 ---
 
 ### 📋 프로젝트 개요
@@ -94,7 +94,7 @@
 
 ## 🖨 ERD
 
-![ERD](https://github.com/ssafy-pjt-run-moneey/final-pjt/blob/main/image/ERD.png)
+![ERD](image/ERD.png)
 
 ---
 
@@ -158,7 +158,7 @@
 
 ### 1. 메인 페이지
 
-![mainpage](https://github.com/user-attachments/assets/fdbb3af6-5c1c-4ac5-982d-04b1cc94c06e)
+![mainpage](image/mainpage.gif)
 
 - nav-bar과 v-carousel을 이용한 메인페이지
 
@@ -170,7 +170,7 @@
 
 #### 2-1. 회원 가입
 
-![user_signup](https://github.com/user-attachments/assets/775e7213-1e3f-4981-8b0b-f44c1515f2aa)
+![user_signup](image/user_signup.gif)
 
 - 이름, 이메일, 비밀번호를 입력해 회원 가입 가능
 
@@ -180,7 +180,7 @@
 
 #### 2-2. 로그인 / 로그아웃
 
-![user_loginout](https://github.com/user-attachments/assets/942107f4-0667-4a95-bf66-95cdd41bcf9c)
+![user_loginout](image/user_loginout.gif)
 
 - 로그인 여부에 따라 화면 오른쪽 상단 메뉴 변경
   
@@ -190,7 +190,7 @@
 
 #### 2-3. 회원 정보 수정 / 비밀번호 변경
 
-![user_infochange](https://github.com/user-attachments/assets/0b5da1b8-e2f3-4ffc-a413-7db5bdb3b17e)
+![user_infochange](image/user_infochange.gif)
 
 - 마이페이지에서 회원 정보 수정 가능
 
@@ -198,13 +198,13 @@
 
 #### 2-4. 회원 탈퇴
 
-![user_exit](https://github.com/user-attachments/assets/c649c310-4ed7-4093-9e39-2328b960ae43)
+![user_exit](image/user_exit.gif)
 
 - 회원 탈퇴 시 작성한 게시글, 댓글 모두 삭제
 
 ### 3. 게이미피케이션 성향 테스트
 
-![game](https://github.com/user-attachments/assets/b3e17df0-a711-4866-a002-975ee5949e5a)
+![game](image/game.gif)
 
 - 강아지 달리기 게임 형식의 재미있는 금융 성향 테스트
 
@@ -222,7 +222,7 @@
 
 #### 4-1. 상품 조회
 
-![product_read](https://github.com/user-attachments/assets/ed274637-b0ae-4e8e-8e2e-60488df22af6)
+![product_read](image/product_read.gif)
 
 - 금융 감독원 API 활용해 시중은행의 예적금 상품 실시간 금리 정보 제공
 
@@ -230,7 +230,7 @@
 
 #### 4-2. 상품 상세 페이지
 
-![product_detail](https://github.com/user-attachments/assets/18226d2c-0392-4e00-b170-b7fda7ff892b)
+![product_detail](image/product_detail.gif)
 
 - 해당 상품군의 기간별 평균 금리와 비교한 차트 제공
 
@@ -238,7 +238,7 @@
 
 #### 4-3. 상품 마킹(찜)하기
 
-![product_marking](https://github.com/user-attachments/assets/90b96e26-91f2-42fc-96a9-e99ddf61d24a)
+![product_marking](image/product_marking.gif)
 
 - 마킹 기능을 통한 관심 상품 저장 가능
 
@@ -248,25 +248,25 @@
 
 #### 5-1. 조회
 
-![community_read](https://github.com/user-attachments/assets/d4609991-22c8-4351-befd-2c23a018600f)
+![community_read](image/community_read.gif)
 
 - '달려라 멍니'' 회원들 간 소통 공간
 
 #### 5-2. 게시글 CRUD
 
-![community_article](https://github.com/user-attachments/assets/50163e12-c772-4d6b-b8c4-0f763f7e5636)
+![community_article](image/community_article.gif)
 
 - 게시글 작성자만 수정 및 삭제 가능
 
 #### 5-3. 게시글 상세 페이지 / 댓글 CRUD
 
-![community_comment](https://github.com/user-attachments/assets/a934da6b-191a-4079-85ef-7843aa867d84)
+![community_comment](image/community_comment.gif)
 
 - 댓글 작성자만 수정 및 삭제 가능
 
 #### 5-4. 팔로우 기능
 
-![community_follow](https://github.com/user-attachments/assets/5c3a3b6c-757f-4ae1-af81-0fc7ce360396)
+![community_follow](image/community_follow.gif)
 
 - '달려라 멍니'' 사용자 간 네트워크 형성
 
@@ -274,7 +274,7 @@
 
 ### 6. 주변 은행
 
-![map](https://github.com/user-attachments/assets/1b1f617a-e102-4641-94d8-9deace02e19d)
+![map](image/map.gif)
 
 - 카카오맵 API 활용
 
@@ -284,7 +284,7 @@
 
 ### 7. 환율 계산
 
-![exchange](https://github.com/user-attachments/assets/66c576f0-502c-468a-b216-d83a40685f8d)
+![exchange](image/exchange.gif)
 
 - 한국 수출입 은행 API 활용
 
@@ -292,7 +292,7 @@
 
 ### 8. 마이페이지
 
-![mypage](https://github.com/user-attachments/assets/3d344ea2-44a8-47f6-88a3-f84a93c3e2bf)
+![mypage](image/mypage.gif)
 
 - 사용자의 금융 성향(강아지 유형) 표시
 
@@ -304,7 +304,7 @@
 
 ### 9. 금리 변경 시 구독자 이메일 발송
 
-![email](https://github.com/user-attachments/assets/d8554f03-7d8c-48ca-9f1a-200ebeeac198)
+![email](image/email.gif)
 
 - admin 페이지에서 금리 변경 시, 해당 상품을 마킹한 구독자들에게 이메일 발송
 
@@ -312,7 +312,7 @@
 
 #### 10-1. AI 첫 댓글 생성 서비스
 
-![firstcomment](https://github.com/user-attachments/assets/0d2197d9-2063-4c30-9030-c1579bd4f949)
+![firstcomment](image/firstcomment.gif)
 
 - GPT 기반의 첫 댓글 자동 생성
 
@@ -326,7 +326,7 @@
 
 #### 11. 이스터에그
 
-![easteregg](https://github.com/user-attachments/assets/a2aa5ca9-3a96-4f89-9a6b-96d36106ea4e)
+![easteregg](image/easteregg.gif)
 
 - 커뮤니티에 '이스터에그' 제목의 게시글에 힌트 존재
 
