@@ -204,7 +204,7 @@
 
 ### 3. 게이미피케이션 성향 테스트
 
-![game](https://github.com/user-attachments/assets/99a0cbfc-5fe9-4bbf-9a45-35d41050e03e)
+![game](https://github.com/user-attachments/assets/b3e17df0-a711-4866-a002-975ee5949e5a)
 
 - 강아지 달리기 게임 형식의 재미있는 금융 성향 테스트
 
@@ -222,7 +222,7 @@
 
 #### 4-1. 상품 조회
 
-![product_read](https://github.com/user-attachments/assets/2c921ccf-4000-4a5c-8bc3-6ce2aed3b2b9)
+![product_read](https://github.com/user-attachments/assets/ed274637-b0ae-4e8e-8e2e-60488df22af6)
 
 - 금융 감독원 API 활용해 시중은행의 예적금 상품 실시간 금리 정보 제공
 
@@ -274,7 +274,7 @@
 
 ### 6. 주변 은행
 
-![map](https://github.com/user-attachments/assets/3fbc219c-2a99-48c8-bfcc-ef64c1e8e28c)
+![map](https://github.com/user-attachments/assets/1b1f617a-e102-4641-94d8-9deace02e19d)
 
 - 카카오맵 API 활용
 
@@ -292,7 +292,7 @@
 
 ### 8. 마이페이지
 
-![mypage](https://github.com/user-attachments/assets/dedee7a3-5c34-4ac8-8e6e-7ccc83588bcf)
+![mypage](https://github.com/user-attachments/assets/3d344ea2-44a8-47f6-88a3-f84a93c3e2bf)
 
 - 사용자의 금융 성향(강아지 유형) 표시
 
